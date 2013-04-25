@@ -6,4 +6,6 @@ class StaticRoute
 		res.render "home", {title: "Thermostat Monitor", cdn: Config.cdn, user: req.user}
 	@terms: (req, res) ->
 		res.render "terms", {title: "Thermostat Monitor Terms of Use", cdn: Config.cdn, user: req.user}
+	@log404: (req, res, next) ->
+		res.redirect "/"
 module.exports = StaticRoute

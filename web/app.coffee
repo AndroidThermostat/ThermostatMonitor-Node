@@ -31,12 +31,13 @@ app.configure () ->
 	app.use app.router
 	app.use require('stylus').middleware(__dirname + '/public')
 	app.use express.static(path.join(__dirname, 'public'))
-
+	app.use StaticRoute.log404
 LoginRoute.setupPassport()
 
 app.post "/auth/login", passport.authenticate("local", {successRedirect: '/cp/', failureRedirect: '/'})
 app.post "/cp/location/save", CpRoute.locationSave
 app.post "/cp/thermostat/save", CpRoute.thermostatSave
+app.post "/cp/user/save", CpRoute.userSave
 
 app.get "/", StaticRoute.home
 app.get "/auth/login", passport.authenticate("local", {successRedirect: '/cp/', failureRedirect: '/'})
@@ -55,6 +56,7 @@ app.get "/cp/thermostat/edit/:thermostatId", CpRoute.thermostatEdit
 app.get "/cp/thermostat/:thermostatId", CpRoute.thermostat
 app.get "/cp/thermostat/:thermostatId/csv/cycles", CpRoute.csvCycles
 app.get "/cp/thermostat/:thermostatId/csv/summary", CpRoute.csvSummary
+app.get "/cp/account", CpRoute.userEdit
 app.get "/csv/thermostats", CpRoute.csvThermostats
 app.get "/csv/export", CpRoute.csvExport
 

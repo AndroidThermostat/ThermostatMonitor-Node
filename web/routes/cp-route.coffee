@@ -4,18 +4,17 @@ CpModel = require "../models/cp-model.coffee"
 
 class CpRoute
 	@cp: (req, res) ->
-		pHash = require 'password-hash'
-		#hash = pHash.generate 'password123'
-		#sys.puts hash
-		hash = 'sha1$0b72129e$1$e177c2b3912be21df1416bd9f5a8b330e32060eb'
-		sys.puts (pHash.verify 'password123', hash)
-		sys.puts (pHash.verify 'password1234', hash)
-
 		CpModel.checkAuth req, res
 		CpModel.cpHome req, (data) ->
 			res.render "cp/default", data
-
-
+	@userEdit: (req, res) ->
+		CpModel.checkAuth req, res
+		CpModel.userEdit req.user.id, req, (data) ->
+			res.render "cp/user-edit", data
+	@userSave: (req, res) ->
+		CpModel.checkAuth req, res
+		CpModel.userSave req.user.id, req, (data) ->
+			res.redirect "/cp/"
 	@locationEdit: (req, res) ->
 		CpModel.checkAuth req, res
 		CpModel.locationEdit req.params.locationId, req, (data) ->
@@ -23,9 +22,6 @@ class CpRoute
 	@locationSave: (req, res) ->
 		CpModel.checkAuth req, res
 		CpModel.locationSave req.body.locationId, req, (data) ->
-			#if data.errors.length>0
-			#	res.render "location-edit", data
-			#else
 			res.redirect "/cp/"
 	@thermostatEdit: (req, res) ->
 		CpModel.checkAuth req, res

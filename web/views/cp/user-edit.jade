@@ -1,0 +1,17 @@
+extends ../layout
+
+block content
+	h1 Edit Account
+	form(method='post',action='/cp/user/save')
+		.row
+			.span5
+				b Email
+			.span5 
+				b Password
+		.controls-row
+			input#email.span5(type='text',name='email',value=user.emailAddress)
+			input#password.span5(type='password',name='password')
+			.span2  
+				button.btn.btn-primary.pull-right Save
+		br
+		br

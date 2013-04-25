@@ -8,6 +8,7 @@ Location = require "../../lib/data/location.coffee"
 Thermostat = require "../../lib/data/thermostat.coffee"
 Snapshots = require "../../lib/data/snapshots.coffee"
 Temperatures = require "../../lib/data/temperatures.coffee"
+User = require "../../lib/data/user.coffee"
 OutsideConditions = require "../../lib/data/outside-conditions.coffee"
 Config = require "../../config.coffee"
 LoginRoute = require "../routes/login-route.coffee"
@@ -30,6 +31,19 @@ class CpModel
 			, (err) ->
 				cb
 					title: "Control Panel", user: req.user, cdn: Config.cdn, locations: locations
+
+	@userEdit: (userId, req, cb) ->
+		cb
+			title: "Edit Account", user: req.user, cdn: Config.cdn
+	@userSave: (userId, req, cb) ->
+		errors = []
+		pHash = require "password-hash"
+		req.user.emailAddress = req.body['email']
+		req.user.password = pHash.generate(req.body['password'])
+		user = User.cast(req.user)
+		user.save (err, results) ->
+			cb errors
+
 	@locationEdit: (locationId, req, cb) ->
 		Location.loadOrCreate locationId, (location) ->
 			if location.id==0
