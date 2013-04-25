@@ -1,0 +1,33 @@
+img#logo(src='#{cdn}/images/logo.png')
+.navbar.navbar-inverse
+	.navbar-inner
+		ul.nav.pull-right
+			- if (user==null)
+				li.dropdown
+					a.dropdown-toggle(href="#",data-toggle='dropdown') Sign in
+						strong.caret
+					.dropdown-menu(style='padding: 15px; padding-bottom: 0px;')
+						form#loginForm(action='/auth/login',method='get')
+							input#username(type='text',size='30',name='username',placeholder='Email')
+							input#password(type='password',size='30',name='password',placeholder='Password')
+							input.btn.btn-primary.btn-block(type="submit",name="loginCommit")
+							#register
+								a(href='#',onclick='return register();') Register
+								|  | 
+								a(href='#',onclick='return forgotPassword();') Forgot Password
+			- else
+				li.dropdown
+					a.dropdown-toggle(href="#",data-toggle='dropdown') My Account
+						strong.caret
+					ul.dropdown-menu
+						li
+							a(href='/cp/') My Locations
+						li
+							a(href='/cp/account') Account Settings
+						li
+							a(href='/auth/logout') Logout
+		ul.nav
+			li 
+				a(href="/") Home
+			li 
+				a(href="http://androidthermostat.reddit.com/") Community

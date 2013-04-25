@@ -1,0 +1,15 @@
+{
+  "name": "ThermostatMonitorLib",
+  "version": "0.0.1",
+  "private": false,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "async": "latest",
+    "coffee-script": "latest",
+    "mysql": "latest",
+    "request": "latest",
+    "underscore": "latest"
+  }
+}

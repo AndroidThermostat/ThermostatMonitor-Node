@@ -1,0 +1,12 @@
+extends ../layout
+
+block content
+	h2=title
+	h3 Inside Temperature
+	iframe.chartFrame(src="/cp/charts/temps?thermostatId=#{thermostat.id}&date=#{linkDate}")
+	h3 Outside Temperature
+	iframe.chartFrame(src="/cp/charts/conditions?locationId=#{thermostat.locationId}&date=#{linkDate}")
+	h3 Cycles
+	iframe.chartFrame(src="/cp/charts/cycles?thermostatId=#{thermostat.id}&date=#{linkDate}",style='height:120px')
+	h3 Percentage Run Time
+	iframe.chartFrame(src="/cp/charts/hours/#{thermostat.id}?startDate=#{linkDate}&endDate=#{linkEndDate}")

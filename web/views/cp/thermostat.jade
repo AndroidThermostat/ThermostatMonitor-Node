@@ -1,0 +1,62 @@
+extends ../layout
+
+block content
+	.row
+		.span10
+			i * Chart data becomes more accurate over time
+		.span2.pull-right
+			a(href='/cp/thermostat/#{thermostat.id}/reports') View Reports
+	h1 Thermostat: #{thermostat.displayName}
+	
+	p
+		b CSV Downloads: 
+		a(href='/cp/thermostat/#{thermostat.id}/csv/summary') Summary
+		|  | 
+		a(href='/cp/thermostat/#{thermostat.id}/csv/cycles') Cycles
+	table(cellpadding=4,style='border:1px solid #000;')
+		tr.header
+			td  
+			td.cool(colspan=4) Cool
+			td.heat(colspan=4) Heat
+			td.outside(colspan=2) Outside
+		tr.header
+			td Day
+			td.cool Cycles
+			td.cool Average
+			td.cool Total
+			td.cool Cost
+			td.heat Cycles
+			td.heat Average
+			td.heat Total
+			td.heat Cost
+			td.outside Min
+			td.outside Max
+		- summary.forEach(function(day){
+			tr
+				td
+					a(href='/cp/thermostat/#{thermostat.id}/day/#{day.linkDate}')=day.reportDay
+				td.cool=day.coolCycles
+				td.cool=day.coolAverage
+					- if (day.coolMinutes!=null) 
+						| min
+				td.cool #{day.coolMinutes} 
+					- if (day.coolMinutes!=null) 
+						| min
+				td.cool=day.coolCost
+				td.heat=day.heatCycles
+				td.heat=day.heatAverage
+					- if (day.coolMinutes!=null) 
+						| min
+				td.heat #{day.heatMinutes} 
+					- if (day.heatMinutes!=null) 
+						| min
+				td.heat=day.heatCost
+				td.outside=day.low
+				td.outside=day.high
+		- })
+	h2 Average Run Time by Time of Day
+	p The perecent of each hour that the A/C or furnace has run.
+	iframe.chartFrame(src="/cp/charts/hours/#{thermostat.id}")
+	h2 Average Run Time by Temperature Delta
+	p The percentage of time the A/C or furnace runs for each degree of temperature delta.  An outside temperatue of 90° and inside of 75° would be a 15° temperature delta.
+	iframe.chartFrame(src="/cp/charts/delta/#{thermostat.id}")

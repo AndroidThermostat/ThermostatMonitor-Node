@@ -1,0 +1,45 @@
+extends ../layout
+
+block content
+	h1 Edit Location
+	p 
+		i You can modify this information at any time.
+	form(method='post',action='/cp/thermostat/save')
+		.row
+			.span3 
+				b Display Name
+			.span3 
+				b Brand
+			.span3
+				b#ipLabel Internal IP Address
+		.controls-row
+			input.span3(type='text',name='displayName',placeholder='Downstairs',value=thermostat.displayName)
+			select.span3#brand(type='text',name='brand',onchange='toggleBrand();')
+				option(value='Android Thermostat') Android Thermostat
+				- if (thermostat.brand=='RTCOA')
+					option(value='RTCOA',selected='true') Radio Thermostat
+				- else
+					option(value='RTCOA') Radio Thermostat
+			input.span3#ipAddress(type='text',name='ipAddress',placeholder='192.168.1.106',value=thermostat.ipAddress)
+		.row
+			.span3
+				b AC Tons
+			.span3
+				b AC SEER
+			.span3
+				b Heater Input BTU/h
+			.span3
+				b Blower kw/h
+		.controls-row
+			input.span3(type='text',name='acTons',placeholder='5',value=thermostat.acTons)
+			input.span3(type='text',name='acSeer',placeholder='16',value=thermostat.acSeer)
+			input.span3(type='text',name='heatBtuPerHour',placeholder='100,000',value=thermostat.heatBtuPerHour)
+			input.span3(type='text',name='fanKilowatts',placeholder='0.5',value=thermostat.fanKilowatts)
+		button.btn.btn-primary.pull-right Save
+
+		input(type='hidden',name='thermostatId',value=thermostat.id)
+		input(type='hidden',name='locationId',value=thermostat.locationId)
+
+		script
+			toggleBrand();
+

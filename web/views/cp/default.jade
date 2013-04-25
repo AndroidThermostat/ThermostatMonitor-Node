@@ -1,0 +1,40 @@
+extends ../layout
+
+block content
+	h1 Control Panel
+	.row
+		.span2 
+			b Location
+		.span6 
+			b Thermostat
+		.span4 
+			b Actions
+	- locations.forEach(function(location){
+		.row
+			.span8 #{location.name}
+			.span4.pull-right
+				a.btn.btn-small.btn-success(style="margin:5px",href='/cp/location/edit/#{location.id}') Edit
+				- if (location.showApi==true)
+					a.btn.btn-small.btn-info(style="margin:5px",href="#",onclick="return showAPIKey('location','#{location.apiKey}');") API Key
+				a.btn.btn-small.btn-inverse(style="margin:5px",href='/cp/thermostat/edit/0?locationId=#{location.id}') Add Thermostat
+		- location.thermostats.forEach(function(thermostat){
+			.row
+				.span6.offset2 #{thermostat.displayName}
+				.span4.pull-right
+					a.btn.btn-small.btn-success(style="margin:5px;",href='/cp/thermostat/edit/#{thermostat.id}') Edit
+					- if (thermostat.brand=='Android Thermostat')
+						a.btn.btn-small.btn-info(style="margin:5px;",href="#",onclick="return showAPIKey('thermostat','#{thermostat.keyName}');") API Key
+					a.btn.btn-small.btn-primary(style="margin:5px;",href='/cp/thermostat/#{thermostat.id}') View Stats
+		- })
+	- })
+
+	br
+	a.btn.btn-inverse.btn-small(href='/cp/location/edit/0') Add Location
+	br
+	#apiKeyModal.modal.hide.fade
+		.modal-header
+			button.close(type="button",data-dismiss="modal",aria-hidden="true") &times;
+			h3 API Key
+		#apiKeyModalBody.modal-body
+	br
+	br

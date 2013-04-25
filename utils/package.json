@@ -1,0 +1,12 @@
+{
+    "name": "ThermostatMonitorUtils"
+  , "version": "0.0.1"
+  , "author": "Jeremy Zongker <jeremy@thermostatmonitor.com>"
+  , "description": "An open source tool for tracking thermostat usage"
+  , "private": false
+  , "engine": { "node": ">=0.6" }
+  , "dependencies": {
+    "coffee-script": "latest"
+    , "mysql": "latest" 
+  }
+}

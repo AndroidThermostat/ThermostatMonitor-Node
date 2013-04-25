@@ -1,0 +1,34 @@
+extends ../layout
+
+block content
+	.row
+		.span8
+			h2 Report for: #{thermostat.displayName}
+			p
+				i These reports allow you to compare performance over different date ranges. You can use these reports to see how changes like changing air filters or adjusting the swing on your thermostat affect system performance. The accuracy of these reports improve with wider date ranges.
+		.span4
+			.row
+				.span2 Start Date
+				.span2 End Date
+			.controls-row
+				input#startDate.span2(type='text',name='startDate',value=startDate)
+				input#endDate.span2(type='text',name='endDate',value=endDate)
+			.controls-row
+				label.checkbox
+					input#compare(name='compare',type='checkbox',checked=(compare ? "checked" : undefined))
+					| Compare to Past
+			.row
+				.span2 Start Date
+				.span2 End Date
+			.controls-row
+				input#prevStartDate.span2(type='text',name='prevStartDate',value=prevStartDate)
+				input#prevEndDate.span2(type='text',name='prevEndDate',value=prevEndDate)
+			.controls-row
+				button.btn.btn-primary(onclick="updateReports()") Apply
+
+	h3 Average Run Time by Time of Day
+	p The perecent of each hour that the A/C or furnace has run.
+	iframe.chartFrame(src="/cp/charts/hours/#{thermostat.id}?startDate=#{startDate}&endDate=#{endDate}&prevStartDate=#{prevStartDate}&prevEndDate=#{prevEndDate}&compare=#{compare}")
+	h3 Average Run Time by Temperature Delta
+	p The percentage of time the A/C or furnace runs for each degree of temperature delta.  An outside temperatue of 90° and inside of 75° would be a 15° temperature delta.
+	iframe.chartFrame(src="/cp/charts/delta/#{thermostat.id}?startDate=#{startDate}&endDate=#{endDate}&prevStartDate=#{prevStartDate}&prevEndDate=#{prevEndDate}&compare=#{compare}")

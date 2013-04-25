@@ -1,0 +1,54 @@
+extends ../layout
+
+block content
+	h1 Edit Location
+	form(method='post',action='/cp/location/save')
+		.row
+			.span3 
+				b Display Name
+			.span3 
+				b Zip Code
+			.span3 
+				b Electricity Price
+				br
+				| in 
+				u cents
+				|  /KWh
+			.span3 
+				b Heat Fueld Price
+				br
+				| in 
+				u dollars 
+				| / Dekatherm
+		.controls-row
+			input.span3(type='text',name='name',placeholder='Home',value=location.name)
+			input.span3(type='text',name='zipCode',placeholder='90210',value=location.zipCode)
+			input.span3(type='text',name='electricity',placeholder='9.00',value=location.electricityPrice)
+			input#heat.span3(type='text',name='heat',placeholder='10.00',value=location.heatFuelPrice)
+		.row
+			.span6 
+				b Time Zone		
+		.controls-row
+			select.span6(name='timezone')
+				- timeZones.forEach(function(tz){
+					- if (tz.value==location.timezone)
+						option(selected='selected',value=tz.value) #{tz.name}
+					- else
+						option(value=tz.value) #{tz.name}
+				- })
+			.span3
+				label.checkbox
+					input(type="checkbox",name='daylightSavings',checked=location.daylightSavings) 
+					| Observe Daylight Savings
+			.span2
+				label.checkbox
+					input(type="checkbox",name='shareData',checked=location.shareData) 
+					| Share Data
+			.span1
+				button.btn.btn-primary.pull-right Save
+		input(type='hidden',name='locationId',value=location.id)
+		br
+		br
+		i * We provide a public export file containing the usage stats of those who have opted to share their data. This export is file doesn't contain any personally identifying information and is is available for download by anyone. Having usage statistics from hundreds of thermostats is very useful for those looking for ways to make heating and cooling more efficient. I encourage you to contribute by sharing your usage, but it is optional.
+		script
+			$(function(){$('#heat').tooltip({'trigger':'focus', 'placement':'bottom', 'title': '1 Dekatherm = 1,000,000 BTU'});});

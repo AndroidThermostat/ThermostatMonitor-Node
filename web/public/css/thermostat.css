@@ -1,0 +1,11 @@
+body {color:#333;background-color:#333;}
+#page {width:970px;background-color:#FFF;margin-left:auto;margin-right:auto;padding-top:10px;}
+#logo {margin:10px 0px;}
+#register {margin-top:10px;text-align:center;}
+.chartFrame {width:940px;height:210px;border-style: none;margin:0px;padding:0px;}
+#chartBody {border:0px;background-color:#FFF;}
+#chartDiv {width:940px;height:200px;}
+.cool { background-color:#EEF;}
+.heat { background-color:#FEE;}
+.outside { background-color:#EEE;}
+.header {font-weight:bold;}

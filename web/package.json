@@ -1,0 +1,23 @@
+{
+  "name": "ThermostatMonitor",
+  "version": "0.0.1",
+  "private": false,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "async": "latest",
+    "coffee-script": "latest",
+    "connect-form": "latest",
+    "emailjs": "latest",
+    "express": "latest",
+    "jade": "latest",
+    "node-native-zip": "latest",
+    "passport": "latest",
+    "passport-local": "latest",
+    "password-hash": "latest",
+    "stylus": "latest",
+    "supervisor": "latest",
+    "underscore": "latest"
+  }
+}

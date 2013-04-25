@@ -1,0 +1,12 @@
+html
+	body#chartBody
+		link(rel='stylesheet', href='http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/css/thermostat.css')
+		script(src='https://www.google.com/jsapi')
+		script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
+		script(src='http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js')
+		script(src='/js/thermostat.js')
+		script
+			var chartData=!{data};google.load("visualization", "1", {packages:["corechart"]});google.setOnLoadCallback(drawHourChart);
+		#chartDiv
+
