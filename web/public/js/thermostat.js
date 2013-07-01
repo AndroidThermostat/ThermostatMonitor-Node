@@ -69,7 +69,7 @@ function drawCyclesChart()
 	}
 	var chart = new google.visualization.AnnotatedTimeLine($('#chartDiv')[0]);
 	var startDate = new Date(chartData[0][0]);
-	chart.draw(data, {width: 940, height: 100, interpolateNulls: true, pointSize: 1, displayLegendDots:false, displayLegendValues:false, displayRangeSelector:false, displayZoomButtons:false, fill:100, dateFormat:'h:mm', scaleType:'maximized', zoomStartTime:startDate });
+	chart.draw(data, {width: 940, height: 100, interpolateNulls: true, pointSize: 1, displayRangeSelector:false, displayZoomButtons:false, fill:100, dateFormat:'h:mm', scaleType:'maximized', zoomStartTime:startDate });
 
 }
 
