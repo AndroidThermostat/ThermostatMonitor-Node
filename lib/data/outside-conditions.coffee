@@ -14,8 +14,8 @@ class OutsideConditions extends OutsideConditionsBase
 		data = []
 		OutsideConditions.loadRange locationId, new Date('2000-01-01'), new Date(), (temps) =>
 			temps.forEach (temp) ->
-				data.push [Utils.getDisplayDate(temp.logDate,'yyyy-mm-dd HH:MM:ss'), temp.degrees]
-			output = Utils.getCsv ['LogDate','Degrees'], data
+				data.push [locationId,Utils.getDisplayDate(temp.logDate,'yyyy-mm-dd HH:MM:ss'), temp.degrees]
+			output = Utils.getCsv ['LocationId','LogDate','Degrees'], data
 			cb output
 	@loadRange: (locationId, startDate, endDate, cb) ->
 		OutsideConditions.loadFromQuery "SELECT * FROM outside_conditions WHERE location_id=" + Global.escape(locationId) + " and log_date BETWEEN " + Global.escape(startDate) + " AND " + Global.escape(endDate) + " ORDER BY log_date",null, cb

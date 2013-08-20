@@ -14,8 +14,8 @@ class Temperatures extends TemperaturesBase
 		data = []
 		Temperatures.loadRange thermostatId, new Date('2000-01-01'), new Date(), (temps) =>
 			temps.forEach (temp) ->
-				data.push [Utils.getDisplayDate(temp.logDate,'yyyy-mm-dd HH:MM:ss'), temp.degrees]
-			output = Utils.getCsv ['LogDate','Degrees'], data
+				data.push [thermostatId, Utils.getDisplayDate(temp.logDate,'yyyy-mm-dd HH:MM:ss'), temp.degrees]
+			output = Utils.getCsv ['ThermostatId','LogDate','Degrees'], data
 			cb output
 	@cast = (baseClass) ->
 		baseClass.__proto__ = Temperatures::

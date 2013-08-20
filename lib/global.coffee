@@ -5,7 +5,7 @@ Config = require "../config.coffee"
 class Global
 	@escape: (param) ->
 		return mysql.escape param
-	@poolLength: 8
+	@poolLength: 20
 	@handleDisconnect: (conn) ->
 		conn.on "error", (err) ->
 			return if not err.fatal

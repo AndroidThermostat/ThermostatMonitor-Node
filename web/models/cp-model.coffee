@@ -161,6 +161,10 @@ class CpModel
 		], (err, results) ->
 			folder = './public/csv/'
 			locations = Locations.cast(results[1])
+			snapshotsCsv = ''
+			cyclesCsv = ''
+			insideCsv = ''
+			outsideCsv = ''
 			async.parallel [(callback2) =>
 				Thermostats.getCsv results[0], locations, (csv) ->
 					fs.writeFile folder + 'thermostats.csv', csv, (output) ->
@@ -168,40 +172,52 @@ class CpModel
 			, (callback2) =>
 				q = async.queue (task, callback3) ->
 					Snapshots.getDailySummaryCsv task.thermostat, task.location, new Date('2000-01-01'), new Date(), (csv) ->
-						fs.writeFile folder + 't' + task.thermostat.id + '_summary.csv', csv, (output) ->
-							callback3()
+						#fs.writeFile folder + 't' + task.thermostat.id + '_summary.csv', csv, (output) ->
+						snapshotsCsv += csv + '\r\n'
+						callback3()
 				q.drain = () ->
-					callback2 null, "Summary"
+					fs.writeFile folder + 'summary.csv', snapshotsCsv, (output) ->
+						snapshotsCsv = ''
+						callback2 null, "Summary"
 				results[0].forEach (thermostat) ->
 					location = locations.getById thermostat.locationId
 					q.push {thermostat: thermostat, location:location} if location.shareData
 			, (callback2) =>
 				q = async.queue (task, callback3) ->
 					Cycles.getCsv task.thermostat, (csv) ->
-						fs.writeFile folder + 't' + task.thermostat.id + '_cycles.csv', csv, (output) ->
-							callback3()
+						cyclesCsv += csv + '\r\n'
+						#fs.writeFile folder + 't' + task.thermostat.id + '_cycles.csv', csv, (output) ->
+						callback3()
 				q.drain = () ->
-					callback2 null, "Cycles"
+					fs.writeFile folder + 'cycles.csv', cyclesCsv, (output) ->
+						cyclesCsv = ''
+						callback2 null, "Cycles"
 				results[0].forEach (thermostat) ->
 					location = locations.getById thermostat.locationId
 					q.push {thermostat: thermostat, location:location} if location.shareData
 			, (callback2) =>
 				q = async.queue (task, callback3) ->
 					Temperatures.getCsv task.thermostat.id, (csv) ->
-						fs.writeFile folder + 't' + task.thermostat.id + '_inside.csv', csv, (output) ->
-							callback3()
+						#fs.writeFile folder + 't' + task.thermostat.id + '_inside.csv', csv, (output) ->
+						insideCsv += csv + '\r\n'
+						callback3()
 				q.drain = () ->
-					callback2 null, "Temps"
+					fs.writeFile folder + 'inside.csv', insideCsv, (output) ->
+						insideCsv = ''
+						callback2 null, "Temps"
 				results[0].forEach (thermostat) ->
 					location = locations.getById thermostat.locationId
 					q.push {thermostat: thermostat, location:location} if location.shareData
 			, (callback2) =>
 				q = async.queue (task, callback3) ->
 					OutsideConditions.getCsv task.location.id, (csv) ->
-						fs.writeFile folder + 'l' + task.location.id + '_outside.csv', csv, (output) ->
-							callback3()
+						#fs.writeFile folder + 'l' + task.location.id + '_outside.csv', csv, (output) ->
+						outsideCsv += csv + '\r\n'
+						callback3()
 				q.drain = () ->
-					callback2 null, "OutsideConditions"
+					fs.writeFile folder + 'outside.csv', outsideCsv, (output) ->
+						outsideCsv = ''
+						callback2 null, "OutsideConditions"
 				results[0].forEach (thermostat) ->
 					location = locations.getById thermostat.locationId
 					q.push {thermostat: thermostat, location:location} if location.shareData
@@ -218,7 +234,7 @@ class CpModel
 					buff = archive.toBuffer()
 					fs.writeFileSync folder + 'export.zip', buff
 					files.forEach (file) ->
-						fs.unlinkSync folder + file
+						fs.unlinkSync folder + file if file.indexOf('.csv')>-1
 					cb()
 
 

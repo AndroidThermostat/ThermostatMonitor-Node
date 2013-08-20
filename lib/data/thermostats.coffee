@@ -14,8 +14,8 @@ class Thermostats extends ThermostatsBase
 		thermostats.forEach (thermostat) ->
 			location = locations.getById thermostat.locationId
 			if location.shareData
-				data.push [thermostat.id, thermostat.locationId, thermostat.acTons, thermostat.acSeer, thermostat.acKilowatts, thermostat.fanKilowatts, thermostat.heatBtuPerHour, location.zipCode, location.electricityPrice, location.timezone ]
-		output = Utils.getCsv ['Id','LocationId','AcTons','AcSeer','AcKilowatts','FanKilowatts','HeatBtuPerHour','ZipCode','ElectricityPrice','Timezone'], data
+				data.push [thermostat.id, thermostat.locationId, thermostat.acTons, thermostat.acSeer, thermostat.acKilowatts, thermostat.fanKilowatts, thermostat.heatBtuPerHour, location.zipCode, location.electricityPrice, location.heatFuelPrice, location.timezone ]
+		output = Utils.getCsv ['Id','LocationId','AcTons','AcSeer','AcKilowatts','FanKilowatts','HeatBtuPerHour','ZipCode','ElectricityPrice','HeatFuelPrice','Timezone'], data
 		cb output
 	@cast = (baseClass) ->
 		baseClass.__proto__ = Thermostats::

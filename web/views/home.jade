@@ -1,6 +1,11 @@
 extends layout
 
 block content
+	p
+		span.label.label-info Notice:
+		|  The site recently underwent a full re-write and it'll be necessary to use the Forgot Password link to log in for the first time on the new site.  See 
+		a(href='http://www.reddit.com/r/AndroidThermostat/comments/1d26ob/thermostatmonitorcom_updates/') this thread 
+		|  for more info.
 	#homeCarousel.carousel.slide
 		ol.carousel-indicators
 			li(data-target='#homeCarousel',data-slide-to='0',class='active')
@@ -18,6 +23,7 @@ block content
 				img(src='#{cdn}/img/slide4.jpg')
 	script
 		$('#homeCarousel').carousel();
+
 	h1 Introducing Thermostat Monitor
 	img(align='right',style='margin:0px 0px 10px 10px',src='#{cdn}/img/desktopapp.gif')
 	p Thermostat Montior is an open source project for tracking thermostat usage patterns.  It currently supports WiFi enabled thermostats made by <a href="http://radiothermostat.com/">Radio Thermostat</a> and <a href="http://androidthermostat.com/">Android Thermostat</a>.</p>

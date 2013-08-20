@@ -49,6 +49,8 @@ block content
 		input(type='hidden',name='locationId',value=location.id)
 		br
 		br
-		i * We provide a public export file containing the usage stats of those who have opted to share their data. This export is file doesn't contain any personally identifying information and is is available for download by anyone. Having usage statistics from hundreds of thermostats is very useful for those looking for ways to make heating and cooling more efficient. I encourage you to contribute by sharing your usage, but it is optional.
+		i * We provide a 
+			a(href="/csv/export.zip") public export file
+			|  (about 100MB) containing the usage stats of those who have opted to share their data. This export is file doesn't contain any personally identifying information and is is available for download by anyone. Having usage statistics from hundreds of thermostats is very useful for those looking for ways to make heating and cooling more efficient. I encourage you to contribute by sharing your usage, but it is optional.
 		script
 			$(function(){$('#heat').tooltip({'trigger':'focus', 'placement':'bottom', 'title': '1 Dekatherm = 1,000,000 BTU'});});

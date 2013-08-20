@@ -40,7 +40,9 @@ class CpRoute
 			res.render "cp/thermostat", data
 	@thermostatDay: (req, res) ->
 		CpModel.checkAuth req, res
-		CpModel.thermostatDay req.params.thermostatId, new Date(req.params.date), req, (data) ->
+		reportDate = new Date(req.params.date)
+		reportDate.setDate(reportDate.getDate()+1) #temp patch.  I think it has to do with GMT vs CDT
+		CpModel.thermostatDay req.params.thermostatId, reportDate, req, (data) ->
 			res.render "cp/thermostat-day", data
 	@thermostatReport: (req, res) ->
 		CpModel.checkAuth req, res

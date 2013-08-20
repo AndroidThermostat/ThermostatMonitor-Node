@@ -19,8 +19,8 @@ class Cycles extends CyclesBase
 				btus = Math.round(cycle.getMinutes() * thermostat.heatBtuPerHour / 60.0 * 100.0)/100.0 if cycle.cycleType=='Heat'
 				kwH = Math.round(cycle.getMinutes() * thermostat.fanKilowatts / 60.0 * 100.0) / 100.0 if cycle.cycleType=='Heat'
 				kwH = Math.round(cycle.getMinutes() * (thermostat.acKilowatts + thermostat.fanKilowatts) / 60.0 * 100.0) / 100.0 if cycle.cycleType=='Cool'
-				data.push [cycle.cycleType, Utils.getDisplayDate(cycle.startDate,'yyyy-mm-dd HH:MM:ss'), Utils.getDisplayDate(cycle.endDate,'yyyy-mm-dd HH:MM:ss'), cycle.getMinutes(), kwH, btus]
-			output = Utils.getCsv ['CycleType','StartTime','EndTime','Minutes','kwH','BTUs'], data
+				data.push [thermostat.id, cycle.cycleType, Utils.getDisplayDate(cycle.startDate,'yyyy-mm-dd HH:MM:ss'), Utils.getDisplayDate(cycle.endDate,'yyyy-mm-dd HH:MM:ss'), cycle.getMinutes(), kwH, btus]
+			output = Utils.getCsv ['ThermostatId','CycleType','StartTime','EndTime','Minutes','kwH','BTUs'], data
 			cb output
 
 	@loadRange: (thermostatId, startDate, endDate, cb) ->

@@ -3,6 +3,7 @@ Snapshot = require("./snapshot.coffee")
 sys = require("sys")
 Global = require "../global.coffee"
 Utils = require "../utils.coffee"
+async = require "async"
 
 class Snapshots extends SnapshotsBase
 	getHourlyStats: (tzOffset) ->
@@ -37,13 +38,97 @@ class Snapshots extends SnapshotsBase
 		@forEach (item) =>
 			result.push item.id
 		result
+	@generate: (thermostat, cb) ->
+		startDate = new Date(2000,1,1)
+		Snapshot.loadLast thermostat.id, (lastSnapshot) ->
+			startDate = new Date(lastSnapshot.startTime.getTime()) if lastSnapshot!=null
+			dayBefore = new Date(startDate.getTime())
+			dayBefore = dayBefore.setDays(dayBefore.getDates() - 1)
+			async.parallel [(callback) =>
+				cycles.loadRange thermostat.id, startDate, new Date(), (cycles) ->
+					callback null, cycles
+			, (callback) =>
+				temperatures.loadRange thermostat.id, dayBefore, new Date(), (temperatures) ->
+					callback null, temperatures
+			, (callback) =>
+				conditions.loadRange thermostat.locationId, dayBefore, new Date(), (conditions) ->
+					callback null, conditions
+			], (err, results) ->
+				cycles.removeIncomple()
+				if cycles.length==0
+					cb()
+				else
+					lastCycleEndDate = new Date(cycles[0].startDate.getTime())
+					lastCycleEndDate = new Date(startDate.getTime()) if lastSnapShot!=null
+					results[0].forEach (cycle) ->
+						Snapshots.logOffCycle thermostat.id, cycle, lastCycleEndDate, results[1], results[2]
+						Snapshots.logOnCycle thermostat.id, cycle, results[1], results[2]
+						lastCycleEndDate = new Date(cycles[0].endDate.getTime());
+					cb()
+	@logOffCycle: (thermostatId, cycle, lastCycleEndDate, allTemperatures, allConditions, cb) ->
+		temperatures = allTemperatures.getRange(lastCycleEndDate, cycle.startDate)
+		conditions = allConditions.getRange(lastCycleEndDate, cycle.startDate)
+		previousTemperature = allTemperatures.getByTime(lastCycleEndDate)
+		previousCondition = allConditions.getByTime(lastCycleEndDate)
+		temperatures.insert 0, previousTemperature
+		conditions.insert 0, previousCondition
+		if cycle.startDate <= lastCycleEndDate or (conditions.length==0 or temperatures.length==0)
+			cb()
+		else
+			endDate = new Date(cycle.startDate.getTime())
+			s = new Snapshot()
+			s.startTime = new Date(lastCycleEndDate)
+			s.seconds = Math.round((cycle.startDate.getTime() - lastCycleEndDate.getTime()) / 1000)
+			s.thermostatId = thermostatId
+			s.mode = 'Off'
+			s.insideTempAverage = cycles.getTempAverage(lastCycleEndDate, cycle.startDate)
+			s.insideTempHigh = cycles.getTempHigh()
+			s.insideTempLow = cycles.getTempLow()
+			s.outsideTempAverage = conditions.getTempAverage(lastCycleEndDate, cycle.startDate)
+			s.outsideTempHigh = conditions.getTempHigh()
+			s.outsideTempLow = conditions.getTempLow()
+			if (s.seconds > 10 and s.seconds< 86400) #significant and less than a day
+				s.save () ->
+					cb()
+			else
+				cb()
+	@logOnCycle: (thermostatId, cycle, allTemperatures, allConditions, cb) ->
+		temperatures = allTemperatures.getRange(cycle.startDate, cycle.endDate)
+		conditions = allConditions.getRange(cycle.startDate, cycle.endDate)
+		previousTemperature = allTemperatures.getByTime(cycle.startDate)
+		previousCondition = allConditions.getByTime(cycle.startDate)
+		temperatures.insert 0, previousTemperature
+		conditions.insert 0, previousCondition
+		if conditions.length==0 or temperatures.length==0
+			cb()
+		else
+			endDate = new Date(cycle.startDate.getTime())
+			s = new Snapshot()
+			s.startTime = new Date(lastCycleEndDate)
+			s.seconds = Math.round((cycle.startDate.getTime() - lastCycleEndDate.getTime()) / 1000)
+			s.thermostatId = thermostatId
+			s.mode = 'Off'
+			s.insideTempAverage = cycles.getTempAverage(lastCycleEndDate, cycle.startDate)
+			s.insideTempHigh = cycles.getTempHigh()
+			s.insideTempLow = cycles.getTempLow()
+			s.outsideTempAverage = conditions.getTempAverage(lastCycleEndDate, cycle.startDate)
+			s.outsideTempHigh = conditions.getTempHigh()
+			s.outsideTempLow = conditions.getTempLow()
+			if (s.seconds > 10 and s.seconds< 86400) #significant and less than a day
+				s.save () ->
+					cb()
+			else
+				cb()
+
+
+
 	@getDailySummaryCsv: (thermostat, location, startDate, endDate, cb) ->
 		Snapshots.loadDailySummary thermostat, location, startDate, endDate, (rows) =>
 			data = []
 			prevDate = null
 			rows.forEach (row) ->
-				data.push [row.linkDate,row.low,row.high,row.heatCycles,row.heatAverage,row.heatMinutes,row.coolCycles,row.coolAverage,row.coolMinutes]	
-			output = Utils.getCsv ['LogDate','OutsideMin','OutsideMax','HeatCycles','HeatMinutes','HeatAverage','CoolCycles','CoolMinutes','CoolAverage'], data
+				data.push [thermostat.id,row.linkDate,row.low,row.high,row.heatCycles,row.heatMinutes,row.heatAverage,row.coolCycles,row.coolMinutes,row.coolAverage]	
+			output = Utils.getCsv ['ThermostatId','LogDate','OutsideMin','OutsideMax','HeatCycles','HeatMinutes','HeatAverage','CoolCycles','CoolMinutes','CoolAverage'], data
 			cb output
 	@loadDailySummary: (thermostat, location, startDate, endDate, cb) ->
 		days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
@@ -63,7 +148,8 @@ class Snapshots extends SnapshotsBase
 					data.coolCycles = row.cycles
 					data.coolMinutes = Math.round(row.total_seconds / 60.0 * 10.0) / 10.0
 					data.coolAverage = Math.round(row.total_seconds / row.cycles / 60.0 * 10.0) / 10.0
-					data.coolCost = '$' + (row.total_seconds / 3600.0 * (thermostat.acKilowatts + thermostat.fanKilowatts)).toFixed(2)
+					totalKw = row.total_seconds / 3600.0 * (thermostat.acKilowatts + thermostat.fanKilowatts)
+					data.coolCost = '$' + (totalKw * location.electricityPrice / 100.0).toFixed(2)
 				else if row.mode=='Heat'
 					data.heatCycles = row.cycles
 					data.heatMinutes = Math.round(row.total_seconds / 60.0 * 10.0) / 10.0

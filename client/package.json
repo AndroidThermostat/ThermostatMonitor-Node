@@ -1,0 +1,12 @@
+{
+  "name": "ThermostatMonitorClient",
+  "version": "0.0.1",
+  "private": false,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "coffee-script": "latest",
+    "request": "latest"
+  }
+}

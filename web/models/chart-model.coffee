@@ -188,18 +188,19 @@ class ChartModel
 		result
 	@smoothPercents: (data) ->
 		result = []
-		for i in [0..data.length-1]
-			totalRows = 1
-			totalCool = data[i][1]
-			totalHeat = data[i][2]
-			if i>0
-				totalRows++
-				totalCool += data[i-1][1]
-				totalHeat += data[i-1][2]
-			if i + 1 < data.length
-				totalRows++
-				totalCool += data[i+1][1]
-				totalHeat += data[i+1][2]
-			result.push [data[i][0], Math.round(totalCool / totalRows * 100.0) / 100.0, Math.round(totalHeat / totalRows * 100.0) / 100.0]
+		if data.length > 0
+			for i in [0..data.length-1]
+				totalRows = 1
+				totalCool = data[i][1]
+				totalHeat = data[i][2]
+				if i>0
+					totalRows++
+					totalCool += data[i-1][1]
+					totalHeat += data[i-1][2]
+				if i + 1 < data.length
+					totalRows++
+					totalCool += data[i+1][1]
+					totalHeat += data[i+1][2]
+				result.push [data[i][0], Math.round(totalCool / totalRows * 100.0) / 100.0, Math.round(totalHeat / totalRows * 100.0) / 100.0]
 		result
 module.exports = ChartModel
