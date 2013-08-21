@@ -9,14 +9,12 @@ previousOutsideTemp = -100
 logTempChange = (thermostat, temp) ->
 	sys.puts "Logging inside temperature change for: " + thermostat.name + ' - ' + temp
 	url = Config.apiUrl + "?k=" + thermostat.apiKey + '&a=temp&t=' + temp
-	sys.puts url
 	request url, (error, response, body) =>
 	thermostat.previousTemp = temp
 
 logWeatherChange = (temp) ->
 	sys.puts "Logging outside temperature change - " + temp
 	url = Config.apiUrl + "?k=" + Config.thermostats[0].apiKey + '&a=conditions&t=' + temp
-	sys.puts url
 	request url, (error, response, body) =>
 	previousOutsideTemp = temp
 
@@ -24,7 +22,6 @@ logCycleComplete = (thermostat) ->
 	sys.puts "Logging completed " + thermostat.previousState + ' cycle'
 	duration = Math.round((new Date().getTime() - thermostat.startTime) / 1000)
 	url = Config.apiUrl + "?k=" + thermostat.apiKey + '&a=cycle&m=' + thermostat.previousState + '&p=60&d=' + duration
-	sys.puts url
 	request url, (error, response, body) =>
 
 handleStateChange = (thermostat, state) ->
