@@ -46,7 +46,7 @@ checkThermostats = ->
 				when 2
 					state = 'Cool'
 			#state = 'Fan' if state == 'Off' and data.fstate = 1 #Fan remains on after AC
-			logTempChange thermostat, temp if not thermostat.previousTemp? or thermostat.previousTemp!=temp
+			logTempChange thermostat, temp if temp>0 and (not thermostat.previousTemp? or thermostat.previousTemp!=temp)
 			handleStateChange thermostat,state if not thermostat.previousState? or thermostat.previousState!=state
 
 checkWeather = ->
