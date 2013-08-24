@@ -1,0 +1,11 @@
+[Service]
+ExecStart=/usr/bin/node /home/YOURUSERNAMEHERE/thermostat-monitor-client/app.js
+Restart=always
+StandardOutput=syslog
+SyslogIdentifier=thermostat-monitor-client
+User=YOURUSERNAMEHERE
+Group=users
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
