@@ -52,13 +52,14 @@ checkThermostats = ->
 checkWeather = ->
 	url = 'http://openweathermap.org/data/2.1/weather/city/' + Config.openWeatherMapStation
 	request url, (error, response, body) =>
-		data = eval('(' + body + ')')
-		tempK = data.main.temp
-		tempC = tempK - 272.15
-		tempF = Math.round ((tempC * 9 / 5 + 32) * 10) / 10
-		#sys.puts 'Outside Temp: ' + tempF
-		logWeatherChange tempF if not previousOutsideTemp? or previousOutsideTemp!=tempF
-
+		try
+			data = eval('(' + body + ')')
+			tempK = data.main.temp
+			tempC = tempK - 272.15
+			tempF = Math.round ((tempC * 9 / 5 + 32) * 10) / 10
+			logWeatherChange tempF if not previousOutsideTemp? or previousOutsideTemp!=tempF
+		catch err
+			sys.puts "Invalid weather response - " + body
 
 sys.puts "Running"
 setInterval checkThermostats, 60000
