@@ -12,7 +12,7 @@ Register and log into the control panel at [ThermosatMonitor.com](http://thermos
 ### Step 3
 Run the installer for your operating system:
 
-- **Windows** - The Thermostat Monitor Client installs as a Windows Service that runs in the background automatically whenever Windows starts.  You only need to install it once and it will automatically run from that point on.  To install it run the install.bat file in the /install sub folder.
+- **Windows** - The Thermostat Monitor Client installs as a Windows Service that runs in the background automatically whenever Windows starts.  You only need to install it once and it will automatically run from that point on.  To install it run the `install.bat` file in the `/install` sub folder.
 
 - **Macintosh/Ubuntu** - From the folder where you've extracted the client, run `npm install` to download and install the dependencies.  Edit `thermostat-monitor-client.conf`, changing `YOURPATHHERE` to be the path where you have extracted the client.  Copy the file to `/etc/init/`.  The service will run in the background on startup.
 
