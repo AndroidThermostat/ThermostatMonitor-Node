@@ -36,18 +36,21 @@ checkThermostats = ->
 	Config.thermostats.forEach (thermostat) ->
 		url = 'http://' + thermostat.ipAddress + '/tstat'
 		request url, (error, response, body) =>
-			data = eval('(' + body + ')')
-			temp = Math.round(data.temp-0.5)
-			switch data.tstate
-				when 0
-					state = 'Off'
-				when 1
-					state = 'Heat'
-				when 2
-					state = 'Cool'
-			#state = 'Fan' if state == 'Off' and data.fstate = 1 #Fan remains on after AC
-			logTempChange thermostat, temp if temp>0 and (not thermostat.previousTemp? or thermostat.previousTemp!=temp)
-			handleStateChange thermostat,state if not thermostat.previousState? or thermostat.previousState!=state
+			try
+				data = eval('(' + body + ')')
+				temp = Math.round(data.temp-0.5)
+				switch data.tstate
+					when 0
+						state = 'Off'
+					when 1
+						state = 'Heat'
+					when 2
+						state = 'Cool'
+				#state = 'Fan' if state == 'Off' and data.fstate = 1 #Fan remains on after AC
+				logTempChange thermostat, temp if temp>0 and (not thermostat.previousTemp? or thermostat.previousTemp!=temp)
+				handleStateChange thermostat,state if not thermostat.previousState? or thermostat.previousState!=state
+			catch err
+				sys.puts "Invalid thermostat response - " + data
 
 checkWeather = ->
 	url = 'http://openweathermap.org/data/2.1/weather/city/' + Config.openWeatherMapStation
