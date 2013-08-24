@@ -17,6 +17,19 @@ Utils = require "../../lib/utils.coffee"
 
 
 class CpModel
+	@downloadConfig: (locationId, cb) ->
+		Location.load locationId, (location) ->
+			Thermostats.loadByLocation location.id, (thermostats) ->
+				firstThermostat = true
+				result = "class Config\r\n\t@apiUrl: 'http://api.thermostatmonitor.com/v2/',\r\n\t@thermostats: [\r\n"
+				thermostats.forEach (thermostat) ->
+					if thermostat.brand == 'RTCOA'
+						result += "\t\t"
+						result += ", " if !firstThermostat
+						result += "{apiKey: '" + thermostat.keyName + "', ipAddress: '" + thermostat.ipAddress + "', name: '" + thermostat.displayName.replace(/'/g,'') + "'}\r\n"
+						firstThermostat = false
+				result += "\t],\r\n\t@openWeatherMapStation: '" + location.openWeatherCityId + "'\r\nmodule.exports = Config"
+				cb result
 	@checkAuth: (req, res) ->
 		res.redirect('/') if not req.user?
 	@cpHome: (req, cb) ->
@@ -24,9 +37,9 @@ class CpModel
 			async.each locations, (location, cb2) ->
 				Thermostats.loadByLocation location.id, (thermostats) ->
 					location.thermostats = thermostats
-					location.showApi = false
+					location.showInstall = false
 					thermostats.forEach (thermostat) ->
-						location.showApi = true if thermostat.brand == 'RTCOA'
+						location.showInstall = true if thermostat.brand == 'RTCOA'
 					cb2() 
 			, (err) ->
 				cb

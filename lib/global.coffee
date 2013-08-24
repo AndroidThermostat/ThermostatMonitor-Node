@@ -5,7 +5,7 @@ Config = require "../config.coffee"
 class Global
 	@escape: (param) ->
 		return mysql.escape param
-	@poolLength: 20
+	@poolLength: 10
 	@handleDisconnect: (conn) ->
 		conn.on "error", (err) ->
 			return if not err.fatal
@@ -27,6 +27,7 @@ class Global
 				@poolIndex = 0
 		@poolIndex++
 		@poolIndex = 0 if @poolIndex == @poolLength
+		sys.puts "connection - " + @poolIndex
 		@pool[@poolIndex]
 	@closePool: () ->
 		for num in [0..@poolLength - 1]

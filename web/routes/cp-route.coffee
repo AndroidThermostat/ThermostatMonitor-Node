@@ -3,6 +3,12 @@ Config = require "../../config.coffee"
 CpModel = require "../models/cp-model.coffee"
 
 class CpRoute
+	@downloadConfig: (req, res) ->
+		CpModel.downloadConfig req.params.locationId, (data) ->
+			res.setHeader('Content-disposition', 'attachment; filename=config.coffee');
+			res.setHeader('Content-Length', data.length)
+			res.write(data, 'binary')
+			res.end()
 	@cp: (req, res) ->
 		CpModel.checkAuth req, res
 		CpModel.cpHome req, (data) ->

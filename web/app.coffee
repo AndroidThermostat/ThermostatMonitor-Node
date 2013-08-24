@@ -52,6 +52,7 @@ app.get "/cp/charts/conditions", ChartRoute.conditionsChart
 app.get "/cp/charts/cycles", ChartRoute.cyclesChart
 
 app.get "/cp/location/edit/:locationId", CpRoute.locationEdit
+app.get "/cp/location/config/:locationId", CpRoute.downloadConfig
 app.get "/cp/thermostat/edit/:thermostatId", CpRoute.thermostatEdit
 app.get "/cp/thermostat/:thermostatId", CpRoute.thermostat
 app.get "/cp/thermostat/:thermostatId/csv/cycles", CpRoute.csvCycles
