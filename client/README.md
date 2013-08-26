@@ -3,20 +3,24 @@
 This folder contains the open source Node.js client that is used to relay the current temperature and  operating state of your thermostat to ThermosatMonitor.com.  Installation is simple, just complete the following three steps:
 
 ## Setup
+
 ### Step 1
 Download [Node.js](http://nodejs.org/) and run the install
 
 ### Step 2
-Register and log into the control panel at [ThermosatMonitor.com](http://thermostatmonitor.com/), enter your location and thermostat details, download the config file and save it in this folder as config.coffee.
+Register and log into the control panel at [ThermosatMonitor.com](http://thermostatmonitor.com/), enter your location and thermostat details.  Download and unzip the application.  Download your config file and save it in the folder where you unzipped the application, overwriting the example `config.coffee` file.
 
 ### Step 3
-Run the installer for your operating system:
 
-- **Windows** - The Thermostat Monitor Client installs as a Windows Service that runs in the background automatically whenever Windows starts.  You only need to install it once and it will automatically run from that point on.  To install it run the `install.bat` file in the `/install` sub folder.
+The Thermostat Monitor Client installs as a background service that runs silently whenever your computer starts.  You only need to install it once and it will automatically run from that point on.  Follow the installation instructions for your operating system.
 
-- **Macintosh/Ubuntu** - From the folder where you've extracted the client, run `npm install` to download and install the dependencies.  Edit `thermostat-monitor-client.conf`, changing `YOURPATHHERE` to be the path where you have extracted the client.  Copy the file to `/etc/init/`.  The service will run in the background on startup.
+- **Windows** -  Run the `install.bat` file in the `/install` sub folder.
 
-- **Arch/Fedora/Suse Linux** - From the folder where you've extracted the client, run `npm install` to download and install the dependencies.  Edit the `thermostat-monitor-client.service` file, replacing `YOURUSERNAMEHERE` with your user name.  Copy the file to `/etc/systemd/system/`.  The service will run in the background on startup.
+- **Macintosh** - Copy the extracted client application with your custom config file to `/usr/bin/thermostat-monitor-client/`.  From that folder, run `npm install` to install the dependencies.  Copy the `install/com.thermostatmonitor.client.plist` file to `/Library/LaunchDaemons/` so the daemon will automatically run on startup.  Reboot
+
+- **Ubuntu** - From the folder where you've extracted the client, run `npm install` to download and install the dependencies.  Edit `install/thermostat-monitor-client.conf`, changing `YOURPATHHERE` to be the path where you have extracted the client.  Copy `install/thermostat-monitor-client.conf` to `/etc/init/`.  Reboot.
+
+- **Arch/Fedora/Suse** - From the folder where you've extracted the client, run `npm install` to download and install the dependencies.  Edit the `install/thermostat-monitor-client.service` file, replacing `YOURUSERNAMEHERE` with your user name.  Copy `install/thermostat-monitor-client.service` to `/etc/systemd/system/`.  Reboot
 
 ## License
 
