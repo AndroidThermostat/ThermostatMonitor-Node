@@ -134,7 +134,7 @@ class Snapshots extends SnapshotsBase
 		days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 		result = []
 		sql = 'SELECT date(start_time) as report_date, mode, count(*) as cycles, sum(seconds) as total_seconds, min(outside_temp_low) as low, max(outside_temp_high) as high FROM thermostatmonitor.snapshots where thermostat_id=' + Global.escape(thermostat.id) + ' and start_time between ' + Global.escape(startDate) + ' and ' + Global.escape(endDate) + ' group by date(start_time), mode'
-		Global.getPool().query sql, null, (err, rows) =>
+		Global.query sql, null, (err, rows) =>
 			sys.puts err if err?
 			rows.forEach (row) ->
 				#sys.puts row.report_date
@@ -158,7 +158,7 @@ class Snapshots extends SnapshotsBase
 			cb result
 	@loadDeltas: (thermostatId, startDate, endDate, cb) ->
 		sql = 'select outside_temp_average - inside_temp_average as delta, mode, sum(seconds) as total_seconds from snapshots where thermostat_id=' + Global.escape(thermostatId) + ' and start_time BETWEEN ' + Global.escape(startDate) + ' AND ' + Global.escape(endDate) + ' group by outside_temp_average - inside_temp_average, mode order by delta'
-		Global.getPool().query sql, null, (err, rows) =>
+		Global.query sql, null, (err, rows) =>
 			sys.puts err if err?
 			result = []
 			rows.forEach (row) ->

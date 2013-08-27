@@ -5,31 +5,17 @@ Config = require "../config.coffee"
 class Global
 	@escape: (param) ->
 		return mysql.escape param
-	@poolLength: 10
-	@handleDisconnect: (conn) ->
-		conn.on "error", (err) ->
-			return if not err.fatal
-			conn = mysql.createConnection(Config.connectionString) if not conn?
-			Global.handleDisconnect(conn)
-			conn.connect()
-	@getConnection: () ->
-		if not @conn?
-			@conn = mysql.createConnection(Config.connectionString) 
-			Global.handleDisconnect(@conn)
-		@conn
-	@getPool: () ->
+	@getPool: (cb) ->
 		if not @pool?
-			@pool = []
-			for num in [0..@poolLength - 1]
-				conn = mysql.createConnection(Config.connectionString) 
-				Global.handleDisconnect(conn)
-				@pool.push conn
-				@poolIndex = 0
-		@poolIndex++
-		@poolIndex = 0 if @poolIndex == @poolLength
-		sys.puts "connection - " + @poolIndex
-		@pool[@poolIndex]
-	@closePool: () ->
-		for num in [0..@poolLength - 1]
-			@pool[num].end()
+			@pool = mysql.createPool({ host: Config.dbHost, user: Config.dbUser, password: Config.dbPass, database:Config.dbName})
+		@pool.getConnection (err, conn) ->
+			sys.puts err if err?
+			cb conn
+	@query: (query, params, cb) ->
+		sys.puts query
+		@getPool (conn) ->
+			conn.query query, params, (err, rows) ->
+				sys.puts err if err?
+				conn.end()
+				cb err, rows
 module.exports = Global

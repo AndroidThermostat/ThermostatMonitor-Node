@@ -7,24 +7,24 @@ class LocationBase
 	save: (cb) =>
 		columns = { user_id: @userId, name: @name, api_key: @apiKey, zip_code: @zipCode, electricity_price: @electricityPrice, share_data: @shareData, timezone: @timezone, daylight_savings: @daylightSavings, heat_fuel_price: @heatFuelPrice, open_weather_city_id: @openWeatherCityId }
 		if @id == 0
-			Global.getPool().query "INSERT INTO locations SET ?", columns, (err, result) =>
+			Global.query "INSERT INTO locations SET ?", columns, (err, result) =>
 				sys.puts err if err?
 				@id=result.insertId
 				cb()
 		else
 			sys.puts "updating"
-			Global.getPool().query "UPDATE locations SET ? WHERE id = " + @id, columns, cb
+			Global.query "UPDATE locations SET ? WHERE id = " + @id, columns, cb
 	@load = ( id, cb ) ->
-		Global.getPool().query "SELECT * FROM locations where id = " + id, (err, rows) =>
+		Global.query "SELECT * FROM locations where id = " + id, null, (err, rows) =>
 			result = LocationBase.loadRow rows[0] if (rows.length>0)
 			cb(result);
 	@delete = ( id, cb ) ->
-		Global.getPool().query "DELETE FROM locations where id = " + id, (err, rows) =>
+		Global.query "DELETE FROM locations where id = " + id, null, (err, rows) =>
 			cb();
 	@loadRow = (row) ->
 		return new LocationBase row.id, row.user_id, row.name, row.api_key, row.zip_code, row.electricity_price, row.share_data, row.timezone, row.daylight_savings, row.heat_fuel_price, row.open_weather_city_id
 	@loadFromQuery = ( query, params, cb ) ->
-		Global.getPool().query query, params, (err, rows) =>
+		Global.query query, params, (err, rows) =>
 			sys.puts err if err?
 			result = null
 			result = LocationBase.loadRow rows[0] if rows.length>0

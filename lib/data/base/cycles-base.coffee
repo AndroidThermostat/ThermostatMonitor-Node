@@ -19,7 +19,7 @@ class CyclesBase extends Array
 	@loadAll = ( cb ) ->
 		CyclesBase.loadFromQuery "select * from cycles", {}, cb
 	@loadFromQuery = ( query, params, cb ) ->
-		Global.getPool().query query, params, (err, rows) =>
+		Global.query query, params, (err, rows) =>
 			sys.puts err if err?
 			result = new CyclesBase()
 			rows.forEach (row) ->

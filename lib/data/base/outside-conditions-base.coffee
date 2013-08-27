@@ -19,7 +19,7 @@ class OutsideConditionsBase extends Array
 	@loadAll = ( cb ) ->
 		OutsideConditionsBase.loadFromQuery "select * from outside_conditions", {}, cb
 	@loadFromQuery = ( query, params, cb ) ->
-		Global.getPool().query query, params, (err, rows) =>
+		Global.query query, params, (err, rows) =>
 			sys.puts err if err?
 			result = new OutsideConditionsBase()
 			rows.forEach (row) ->

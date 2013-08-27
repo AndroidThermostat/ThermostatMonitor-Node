@@ -19,7 +19,7 @@ class SnapshotsBase extends Array
 	@loadAll = ( cb ) ->
 		SnapshotsBase.loadFromQuery "select * from snapshots", {}, cb
 	@loadFromQuery = ( query, params, cb ) ->
-		Global.getPool().query query, params, (err, rows) =>
+		Global.query query, params, (err, rows) =>
 			sys.puts err if err?
 			result = new SnapshotsBase()
 			rows.forEach (row) ->

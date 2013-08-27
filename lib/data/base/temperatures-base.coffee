@@ -19,7 +19,7 @@ class TemperaturesBase extends Array
 	@loadAll = ( cb ) ->
 		TemperaturesBase.loadFromQuery "select * from temperatures", {}, cb
 	@loadFromQuery = ( query, params, cb ) ->
-		Global.getPool().query query, params, (err, rows) =>
+		Global.query query, params, (err, rows) =>
 			sys.puts err if err?
 			result = new TemperaturesBase()
 			rows.forEach (row) ->

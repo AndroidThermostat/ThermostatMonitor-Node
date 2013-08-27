@@ -7,23 +7,23 @@ class UserBase
 	save: (cb) =>
 		columns = { email_address: @emailAddress, password: @password, auth_code: @authCode }
 		if @id == 0
-			Global.getPool().query "INSERT INTO users SET ?", columns, (err, result) =>
+			Global.query "INSERT INTO users SET ?", columns, (err, result) =>
 				sys.puts err if err?
 				@id=result.insertId
 				cb()
 		else
-			Global.getPool().query "UPDATE users SET ? WHERE id = " + @id, columns, cb
+			Global.query "UPDATE users SET ? WHERE id = " + @id, columns, cb
 	@load = ( id, cb ) ->
-		Global.getPool().query "SELECT * FROM users where id = " + id, (err, rows) =>
+		Global.query "SELECT * FROM users where id = " + id, null, (err, rows) =>
 			result = UserBase.loadRow rows[0] if (rows.length>0)
 			cb(result);
 	@delete = ( id, cb ) ->
-		Global.getPool().query "DELETE FROM users where id = " + id, (err, rows) =>
+		Global.query "DELETE FROM users where id = " + id, null, (err, rows) =>
 			cb();
 	@loadRow = (row) ->
 		return new UserBase row.id, row.email_address, row.password, row.auth_code
 	@loadFromQuery = ( query, params, cb ) ->
-		Global.getPool().query query, params, (err, rows) =>
+		Global.query query, params, (err, rows) =>
 			sys.puts err if err?
 			result = null
 			result = UserBase.loadRow rows[0] if rows.length>0

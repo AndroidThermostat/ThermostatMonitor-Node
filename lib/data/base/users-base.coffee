@@ -19,7 +19,7 @@ class UsersBase extends Array
 	@loadAll = ( cb ) ->
 		UsersBase.loadFromQuery "select * from users", {}, cb
 	@loadFromQuery = ( query, params, cb ) ->
-		Global.getPool().query query, params, (err, rows) =>
+		Global.query query, params, (err, rows) =>
 			sys.puts err if err?
 			result = new UsersBase()
 			rows.forEach (row) ->

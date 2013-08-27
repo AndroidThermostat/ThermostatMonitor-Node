@@ -19,7 +19,7 @@ class LocationsBase extends Array
 	@loadAll = ( cb ) ->
 		LocationsBase.loadFromQuery "select * from locations", {}, cb
 	@loadFromQuery = ( query, params, cb ) ->
-		Global.getPool().query query, params, (err, rows) =>
+		Global.query query, params, (err, rows) =>
 			sys.puts err if err?
 			result = new LocationsBase()
 			rows.forEach (row) ->

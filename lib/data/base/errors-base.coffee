@@ -19,7 +19,7 @@ class ErrorsBase extends Array
 	@loadAll = ( cb ) ->
 		ErrorsBase.loadFromQuery "select * from errors", {}, cb
 	@loadFromQuery = ( query, params, cb ) ->
-		Global.getPool().query query, params, (err, rows) =>
+		Global.query query, params, (err, rows) =>
 			sys.puts err if err?
 			result = new ErrorsBase()
 			rows.forEach (row) ->
