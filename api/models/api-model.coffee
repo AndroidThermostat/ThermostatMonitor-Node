@@ -14,11 +14,13 @@ class ApiModel
 	@logCycle: (thermostat, mode, duration) ->
 		endDate = new Date()
 		startDate = new Date()
-		startDate.setMinutes(startDate.getMinutes - duration)
+		sys.puts duration
+		#startDate.setMinutes(startDate.getMinutes - duration)
+		startDate = new Date(startDate - duration * 1000)
 		Cycle.logCycle thermostat.id, startDate, endDate, 0, 0, () ->
-			Snapshots.generate thermostat.id
+			Snapshots.generate thermostat, () ->
 	@logConditions: (locationId, temperature) ->
 		OutsideCondition.log locationId, temperature
-	@logTemp: (thermosatat, temperature) ->
-		Temperature.logTemperature thermostat.id, temperature, 0
+	@logTemp: (thermostat, temperature) ->
+		Temperature.log thermostat.id, temperature, 0
 module.exports = ApiModel

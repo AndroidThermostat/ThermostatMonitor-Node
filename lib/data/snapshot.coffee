@@ -17,6 +17,8 @@ class Snapshot extends SnapshotBase
 			adjustedHour = adjustedHour - 24 if adjustedHour > 23
 			result[adjustedHour] = totalSeconds
 		result
+	@loadLast: (thermostatId, cb) ->
+		Snapshot.loadFromQuery "SELECT * FROM snapshots where thermostat_id=" + thermostatId + " and start_time = (select MAX(start_time) from snapshots where thermostat_id=" + thermostatId + ")",[], cb
 	@cast = (baseClass) ->
 		if baseClass != null
 			baseClass.__proto__ = Snapshot::

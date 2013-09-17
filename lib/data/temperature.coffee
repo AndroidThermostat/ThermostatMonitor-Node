@@ -11,4 +11,7 @@ class Temperature extends TemperatureBase
 	@loadFromQuery = ( query, params, cb ) ->
 		TemperatureBase.loadFromQuery query, params, (data) ->
 			cb Temperature.cast(data)
+	@log: (thermostatId, degrees, precision) ->
+		t = new Temperature(0,thermostatId,new Date(),degrees,precision)
+		t.save () ->
 module.exports = Temperature

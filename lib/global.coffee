@@ -12,7 +12,6 @@ class Global
 			sys.puts err if err?
 			cb conn
 	@query: (query, params, cb) ->
-		sys.puts query
 		@getPool (conn) ->
 			conn.query query, params, (err, rows) ->
 				sys.puts err if err?

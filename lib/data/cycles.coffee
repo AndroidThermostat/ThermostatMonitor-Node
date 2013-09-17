@@ -10,6 +10,11 @@ class Cycles extends CyclesBase
 		@forEach (item) =>
 			result.push item.id
 		result
+	getComplete: () =>
+		result = new Cycles
+		@forEach (cycle) ->
+			result.push cycle if cycle.endDate? and cycle.endDate!=null
+		result
 	@getCsv: (thermostat, cb) ->
 		data = []
 		Cycles.loadRange thermostat.id, new Date('2000-01-01'), new Date(), (cycles) =>

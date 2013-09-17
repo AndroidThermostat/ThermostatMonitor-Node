@@ -1,6 +1,7 @@
 sys = require "sys"
 Config = require "../../config.coffee"
 ApiModel = require "../models/api-model.coffee"
+Thermostat = require "../../lib/data/thermostat.coffee"
 
 class ApiRoute
 	@v2: (req, res) ->
@@ -17,13 +18,13 @@ class ApiRoute
 			ApiModel.returnLocation query, (data) ->
 				res.end data
 		else
-			ApiModel.loadThermostat key, (thermostat) ->
+			Thermostat.loadByKey key, (thermostat) ->
 				if thermostat==null
 					res.end "Invalid API Key"
 				else
 					switch action
 						when "cycle"
-							ApiModel.logCycle thermostat, mode
+							ApiModel.logCycle thermostat, mode, duration
 							res.end "OK"
 						when "temp"
 							ApiModel.logTemp thermostat, temperature

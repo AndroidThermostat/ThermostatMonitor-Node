@@ -11,4 +11,7 @@ class OutsideCondition extends OutsideConditionBase
 	@loadFromQuery = ( query, params, cb ) ->
 		OutsideConditionBase.loadFromQuery query, params, (data) ->
 			cb OutsideCondition.cast(data)
+	@log: (locationId, temperature) ->
+		oc = new OutsideCondition(0, temperature, new Date(), locationId)
+		oc.save () ->
 module.exports = OutsideCondition

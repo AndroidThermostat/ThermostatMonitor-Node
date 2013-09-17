@@ -10,6 +10,41 @@ class Temperatures extends TemperaturesBase
 		@forEach (item) =>
 			result.push item.id
 		result
+	getRange: (startDate, endDate) =>
+		result = new Temperatures
+		@forEach (item) =>
+			result.push item if item.logDate>=startDate and item.logDate<=endDate
+		result
+	getByTime: (time) =>
+		result = null
+		@forEach (item) =>
+			result = item if item.logDate<=time
+		result
+	getTempHigh: () =>
+		result = -999
+		@forEach (item) =>
+			result = item.degrees if (item.degrees>result)
+		result
+	getTempLow: () =>
+		result = 999
+		@forEach (item) =>
+			result = item.degrees if (item.degrees<result)
+		result
+	getTempAverage: (startTime, endTime) =>
+		totalSeconds = 0.0
+		totalDegrees = 0.0
+		i = 0
+		@forEach (item) =>
+			tempStart = item.logDate
+			tempEnd = endTime
+			tempStart = startTime if (startTime.getTime() > tempStart.getTime())
+			tempEnd = @[i+1].logDate if @length > i + 1
+			seconds = (tempEnd.getTime() - tempStart.getTime()) / 1000
+			totalSeconds += seconds
+			totalDegrees += item.degrees * seconds
+			i++
+		result = Math.round(totalDegrees / totalSeconds, 1)
+		result
 	@getCsv: (thermostatId, cb) ->
 		data = []
 		Temperatures.loadRange thermostatId, new Date('2000-01-01'), new Date(), (temps) =>

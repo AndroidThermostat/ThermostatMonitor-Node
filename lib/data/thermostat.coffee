@@ -7,6 +7,8 @@ class Thermostat extends ThermostatBase
 			cb new Thermostat()
 		else
 			Thermostat.load thermostatId, cb
+	@loadByKey: (key, cb) ->
+		Thermostat.loadFromQuery "SELECT * FROM thermostats WHERE ?", {key_name:key}, cb
 	@cast = (baseClass) ->
 		if baseClass != null
 			baseClass.__proto__ = Thermostat::
