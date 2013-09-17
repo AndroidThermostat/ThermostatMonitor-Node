@@ -58,7 +58,7 @@ checkWeather = ->
 		try
 			data = eval('(' + body + ')')
 			tempK = data.main.temp
-			tempC = tempK - 272.15
+			tempC = tempK - 273.15
 			tempF = Math.round ((tempC * 9 / 5 + 32) * 10) / 10
 			logWeatherChange tempF if not previousOutsideTemp? or previousOutsideTemp!=tempF
 		catch err
