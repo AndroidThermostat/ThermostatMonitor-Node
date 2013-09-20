@@ -17,7 +17,7 @@ class ApiModel
 		sys.puts duration
 		#startDate.setMinutes(startDate.getMinutes - duration)
 		startDate = new Date(startDate - duration * 1000)
-		Cycle.logCycle thermostat.id, startDate, endDate, 0, 0, () ->
+		Cycle.logCycle thermostat.id, mode, startDate, endDate, 0, 0, () ->
 			Snapshots.generate thermostat, () ->
 	@logConditions: (locationId, temperature) ->
 		OutsideCondition.log locationId, temperature
