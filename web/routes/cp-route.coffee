@@ -29,6 +29,10 @@ class CpRoute
 		CpModel.checkAuth req, res
 		CpModel.locationSave req.body.locationId, req, (data) ->
 			res.redirect "/cp/"
+	@locationDelete: (req, res) ->
+		CpModel.checkAuth req, res
+		CpModel.locationDelete req.body.locationId, req, () ->
+			res.redirect "/cp/"
 	@thermostatEdit: (req, res) ->
 		CpModel.checkAuth req, res
 		CpModel.thermostatEdit req.params.thermostatId, req, (data) ->
@@ -36,9 +40,10 @@ class CpRoute
 	@thermostatSave: (req, res) ->
 		CpModel.checkAuth req, res
 		CpModel.thermostatSave req.body.thermostatId, req, (data) ->
-			#if data.errors.length>0
-			#	res.render "location-edit", data
-			#else
+			res.redirect "/cp/"
+	@thermostatDelete: (req, res) ->
+		CpModel.checkAuth req, res
+		CpModel.thermostatDelete req.body.thermostatId, req, () ->
 			res.redirect "/cp/"
 	@thermostat: (req, res) ->
 		CpModel.checkAuth req, res

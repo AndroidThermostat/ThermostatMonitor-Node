@@ -36,7 +36,9 @@ LoginRoute.setupPassport()
 
 app.post "/auth/login", passport.authenticate("local", {successRedirect: '/cp/', failureRedirect: '/'})
 app.post "/cp/location/save", CpRoute.locationSave
+app.post "/cp/location/delete", CpRoute.locationDelete
 app.post "/cp/thermostat/save", CpRoute.thermostatSave
+app.post "/cp/thermostat/delete", CpRoute.thermostatDelete
 app.post "/cp/user/save", CpRoute.userSave
 
 app.get "/", StaticRoute.home

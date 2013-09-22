@@ -38,19 +38,26 @@ block content
 				- })
 			.span3
 				label.checkbox
-					input(type="checkbox",name='daylightSavings',checked=location.daylightSavings) 
+					input(type="checkbox",name='daylightSavings', checked=(location.daylightSavings==1 ? "checked" : undefined)) 
 					| Observe Daylight Savings
 			.span2
 				label.checkbox
-					input(type="checkbox",name='shareData',checked=location.shareData) 
+					input(type="checkbox",name='shareData', checked=location.shareData) 
 					| Share Data
 			.span1
 				button.btn.btn-primary.pull-right Save
 		input(type='hidden',name='locationId',value=location.id)
-		br
-		br
-		i * We provide a 
-			a(href="/csv/export.zip") public export file
-			|  (about 100MB) containing the usage stats of those who have opted to share their data. This export is file doesn't contain any personally identifying information and is is available for download by anyone. Having usage statistics from hundreds of thermostats is very useful for those looking for ways to make heating and cooling more efficient. I encourage you to contribute by sharing your usage, but it is optional.
-		script
-			$(function(){$('#heat').tooltip({'trigger':'focus', 'placement':'bottom', 'title': '1 Dekatherm = 1,000,000 BTU'});});
+	form(method='post',action='/cp/location/delete')
+		- if (location.id>0)
+			.row
+				.span1
+					button.btn.btn-danger(onclick="return confirm('Are you sure you want to delete this location?  All data will be lost');") Delete
+
+		input(type='hidden',name='locationId',value=location.id)
+	br
+	br
+	i * We provide a 
+		a(href="/csv/export.zip") public export file
+		|  (about 100MB) containing the usage stats of those who have opted to share their data. This export is file doesn't contain any personally identifying information and is is available for download by anyone. Having usage statistics from hundreds of thermostats is very useful for those looking for ways to make heating and cooling more efficient. I encourage you to contribute by sharing your usage, but it is optional.
+	script
+		$(function(){$('#heat').tooltip({'trigger':'focus', 'placement':'bottom', 'title': '1 Dekatherm = 1,000,000 BTU'});});

@@ -1,7 +1,7 @@
 extends ../layout
 
 block content
-	h1 Edit Location
+	h1 Edit Thermostat
 	p 
 		i You can modify this information at any time.
 	form(method='post',action='/cp/thermostat/save')
@@ -39,7 +39,12 @@ block content
 
 		input(type='hidden',name='thermostatId',value=thermostat.id)
 		input(type='hidden',name='locationId',value=thermostat.locationId)
-
-		script
-			toggleBrand();
+	- if (thermostat.id>0)
+		form(method='post',action='/cp/thermostat/delete')
+			input(type='hidden',name='thermostatId',value=thermostat.id)
+			.row
+				.span1
+					button.btn.btn-danger(onclick="return confirm('Are you sure you want to delete this thermostat?  All data will be lost');") Delete
+	script
+		toggleBrand();
 

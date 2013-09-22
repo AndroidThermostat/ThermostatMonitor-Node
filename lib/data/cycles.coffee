@@ -29,7 +29,7 @@ class Cycles extends CyclesBase
 			cb output
 
 	@loadRange: (thermostatId, startDate, endDate, cb) ->
-		sql = 'SELECT * FROM cycles WHERE thermostat_id=' + Global.escape(thermostatId) + ' AND start_date BETWEEN ' + Global.escape(startDate) + ' and ' + Global.escape(endDate)
+		sql = 'SELECT * FROM cycles WHERE thermostat_id=' + Global.escape(thermostatId) + ' AND start_date BETWEEN ' + Global.escape(startDate) + ' and ' + Global.escape(endDate) + ' ORDER BY start_date'
 		Cycles.loadFromQuery sql, null, cb
 	@cast = (baseClass) ->
 		baseClass.__proto__ = Cycles::

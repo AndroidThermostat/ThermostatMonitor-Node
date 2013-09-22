@@ -83,6 +83,11 @@ class CpModel
 				location.userId = req.user.id if location.id==0
 				location.save (err, results) ->
 					cb errors
+	@locationDelete: (locationId, req, cb) ->
+		Location.load locationId, (location) ->
+			if location.userId == req.user.id
+				Location.delete locationId, () ->
+					cb()
 	@thermostatEdit: (thermostatId, req, cb) ->
 		Thermostat.loadOrCreate thermostatId, (thermostat) ->
 			if thermostat.id==0
@@ -106,6 +111,12 @@ class CpModel
 			thermostat.keyName = Utils.key() if not thermostat.keyName? or thermostat.keyName==null or thermostat.keyName==''
 			thermostat.save (err, results) ->
 				cb errors
+	@thermostatDelete: (thermostatId, req, cb) ->
+		Thermostat.load thermostatId, (thermostat) ->
+			Location.load thermostat.locationId, (location) ->
+				if location.userId == req.user.id
+					Thermostat.delete thermostatId, () ->
+						cb()
 	@thermostat: (thermostatId, req, cb) ->
 		endDate = new Date
 		startDate = new Date
