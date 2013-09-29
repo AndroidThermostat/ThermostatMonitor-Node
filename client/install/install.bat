@@ -1,7 +1,7 @@
 echo off
 cd ..
 call npm install
-call install\nssm install ThermostatMonitorClient node.exe %cd%\app.js
+call install\nssm install ThermostatMonitorClient node.exe \"%cd%\app.js\"
 sc config ThermostatMonitorClient start= auto
 sc start ThermostatMonitorClient
 echo.
