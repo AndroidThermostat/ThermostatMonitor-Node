@@ -9,7 +9,7 @@ Utils = require "../utils.coffee"
 async = require "async"
 
 class Snapshots extends SnapshotsBase
-	getHourlyStats: (tzOffset) ->
+	getHourlyStats: (adjustedTimezone) ->
 		result = [] #hour, cool, heat
 		totalSeconds = []
 		totalCool = []
@@ -24,7 +24,7 @@ class Snapshots extends SnapshotsBase
 			totalCool.push 0
 			totalHeat.push 0
 		@forEach (snapshot) ->
-			seconds = snapshot.getSecondsPerHour tzOffset
+			seconds = snapshot.getSecondsPerHour adjustedTimezone
 			for hour of seconds
 				totalSeconds[hour] += seconds[hour]
 				if (snapshot.mode=='Cool')
@@ -46,7 +46,6 @@ class Snapshots extends SnapshotsBase
 		Snapshot.loadLast thermostat.id, (lastSnapshot) ->
 			sys.puts lastSnapshot
 			startDate = new Date(lastSnapshot.startTime.getTime()) if lastSnapshot!=null
-			sys.puts lastSnapshot.startTime + "****"
 			dayBefore = new Date(startDate.getTime())
 			dayBefore = dayBefore.setDate(dayBefore.getDate() - 1)
 			async.parallel [(callback) =>
@@ -139,15 +138,18 @@ class Snapshots extends SnapshotsBase
 				data.push [thermostat.id,row.linkDate,row.low,row.high,row.heatCycles,row.heatMinutes,row.heatAverage,row.coolCycles,row.coolMinutes,row.coolAverage]	
 			output = Utils.getCsv ['ThermostatId','LogDate','OutsideMin','OutsideMax','HeatCycles','HeatMinutes','HeatAverage','CoolCycles','CoolMinutes','CoolAverage'], data
 			cb output
-	@loadDailySummary: (thermostat, location, startDate, endDate, cb) ->
+	@loadDailySummary: (thermostat, location, startDate, endDate, adjustedTimezone, cb) ->
 		days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 		result = []
-		sql = 'SELECT date(start_time) as report_date, mode, count(*) as cycles, sum(seconds) as total_seconds, min(outside_temp_low) as low, max(outside_temp_high) as high FROM thermostatmonitor.snapshots where thermostat_id=' + Global.escape(thermostat.id) + ' and start_time between ' + Global.escape(startDate) + ' and ' + Global.escape(endDate) + ' group by date(start_time), mode'
+		sql = 'SELECT date(start_time) as report_date, mode, count(*) as cycles, sum(seconds) as total_seconds, min(outside_temp_low) as low, max(outside_temp_high) as high FROM thermostatmonitor.snapshots where thermostat_id=' + Global.escape(thermostat.id) + ' and start_time between ' + Global.escape(Utils.getServerDate(startDate, adjustedTimezone)) + ' and ' + Global.escape(Utils.getServerDate(endDate, adjustedTimezone)) + ' group by date(start_time), mode'
+		console.log sql
 		Global.query sql, null, (err, rows) =>
 			sys.puts err if err?
 			rows.forEach (row) ->
-				#sys.puts row.report_date
-				row.report_date.setHours(row.report_date.getHours() + 5)
+				#row.report_date.setHours(row.report_date.getHours() + 5)
+				sys.puts row.report_date
+				row.report_date = Utils.getUtc(row.report_date)
+				sys.puts row.report_date
 				result.push {reportDate: row.report_date, reportDay: days[row.report_date.getDay()], linkDate: Utils.getDisplayDate(row.report_date,'yyyy-mm-dd') } if result.length==0 or result[result.length-1].reportDate.getDay() != row.report_date.getDay()
 				data = result[result.length-1]
 
@@ -174,8 +176,11 @@ class Snapshots extends SnapshotsBase
 				result.push 
 					delta: row.delta, mode: row.mode, totalSeconds: row.total_seconds
 			cb result
-	@loadRange: (thermostatId, startDate, endDate, cb) ->
-		Snapshots.loadFromQuery "SELECT * FROM Snapshots WHERE thermostat_id=" + Global.escape(thermostatId) + " and start_time BETWEEN " + Global.escape(startDate) + " AND " + Global.escape(endDate) + " ORDER BY start_time",null, cb
+	@loadRange: (thermostatId, startDate, endDate, adjustedTimezone, cb) ->
+		Snapshots.loadFromQuery "SELECT * FROM Snapshots WHERE thermostat_id=" + Global.escape(thermostatId) + " and start_time BETWEEN " + Global.escape(Utils.getServerDate(startDate, adjustedTimezone)) + " AND " + Global.escape(Utils.getServerDate(endDate, adjustedTimezone)) + " ORDER BY start_time",null, (snapshots) ->
+			snapshots.forEach (snapshot) ->
+				snapshot.startTime = Utils.getUserDate(snapshot.startTime, adjustedTimezone)
+			cb snapshots
 	@cast = (baseClass) ->
 		baseClass.__proto__ = Snapshots::
 		return baseClass

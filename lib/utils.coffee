@@ -29,4 +29,31 @@ class Utils
 				first = false
 			output += '\r\n'
 		return output
+	@isDaylightSavings: () ->
+		jan = new Date(new Date().getFullYear(), 0, 1)
+		now = new Date()
+		jan.getTimezoneOffset()!=now.getTimezoneOffset()
+	@getAdjustedTimezone: (timezone, daylightSavings) ->
+		timezone = timezone + 1 if daylightSavings and @isDaylightSavings()
+	@getServerDate: (userDate, timezone, daylightSavings) ->
+		timezone = @getAdjustedTimezone if daylightSavings?
+		timezoneAdjustment = timezone + new Date().getTimezoneOffset() / 60
+		userDate.setHours(userDate.getHours() - timezoneAdjustment)
+		userDate
+	@getUserDate: (serverDate, timezone, daylightSavings) ->
+		timezone = @getAdjustedTimezone if daylightSavings?
+		timezoneAdjustment = new Date().getTimezoneOffset() / 60 + timezone
+		serverDate.setHours(serverDate.getHours() + timezoneAdjustment)
+		serverDate
+	@getUtc: (date) ->
+		date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
+		date
+	@removeTime: (date) ->
+		date.setMinutes(-date.getTimezoneOffset())
+		date.setUTCHours(0)
+		date.setUTCMinutes(0)
+		date.setUTCSeconds(0)
+		date.setUTCMilliseconds(0)
+		date
+
 module.exports = Utils

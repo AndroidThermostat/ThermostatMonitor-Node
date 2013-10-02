@@ -38,7 +38,7 @@ class OutsideConditions extends OutsideConditionsBase
 			tempStart = item.logDate
 			tempEnd = endTime
 			tempStart = startTime if (startTime.getTime() > tempStart.getTime())
-			tempEnd = @[i+1].logDate if @length > i + 1
+			tempEnd = @[i+1].logDate if @length > i + 1 and @[i+1]?
 			seconds = (tempEnd.getTime() - tempStart.getTime()) / 1000
 			totalSeconds += seconds
 			totalDegrees += item.degrees * seconds
@@ -52,8 +52,12 @@ class OutsideConditions extends OutsideConditionsBase
 				data.push [locationId,Utils.getDisplayDate(temp.logDate,'yyyy-mm-dd HH:MM:ss'), temp.degrees]
 			output = Utils.getCsv ['LocationId','LogDate','Degrees'], data
 			cb output
-	@loadRange: (locationId, startDate, endDate, cb) ->
-		OutsideConditions.loadFromQuery "SELECT * FROM outside_conditions WHERE location_id=" + Global.escape(locationId) + " and log_date BETWEEN " + Global.escape(startDate) + " AND " + Global.escape(endDate) + " ORDER BY log_date",null, cb
+	@loadRange: (locationId, startDate, endDate, adjustedTimezone, cb) ->
+		OutsideConditions.loadFromQuery "SELECT * FROM outside_conditions WHERE location_id=" + Global.escape(locationId) + " and log_date BETWEEN " + Global.escape(Utils.getServerDate(startDate, adjustedTimezone)) + " AND " + Global.escape(Utils.getServerDate(endDate, adjustedTimezone)) + " ORDER BY log_date",null, (conds) ->
+			conds.forEach (cond) ->
+				cond.logDate = Utils.getUserDate(cond.logDate, adjustedTimezone)
+			cb conds
+
 	@cast = (baseClass) ->
 		baseClass.__proto__ = OutsideConditions::
 		return baseClass

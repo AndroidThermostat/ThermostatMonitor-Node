@@ -2,7 +2,7 @@ sys = require("sys")
 SnapshotBase = require("./base/snapshot-base.coffee")
 
 class Snapshot extends SnapshotBase
-	getSecondsPerHour: (tzOffset) ->
+	getSecondsPerHour: (adjustedTimezone) ->
 		startHour = @startTime.getHours()
 		endTime = new Date(@startTime)
 		endTime.setSeconds(endTime.getSeconds() + @seconds)
@@ -12,7 +12,7 @@ class Snapshot extends SnapshotBase
 			totalSeconds = 3600
 			totalSeconds = endTime.getMinutes() * 60 + endTime.getSeconds() if i==endHour
 			totalSeconds = totalSeconds - @startTime.getMinutes() * 60 - @startTime.getSeconds() if i==startHour
-			adjustedHour = i + tzOffset
+			adjustedHour = i + 0
 			adjustedHour = 24 + adjustedHour if adjustedHour < 0
 			adjustedHour = adjustedHour - 24 if adjustedHour > 23
 			result[adjustedHour] = totalSeconds

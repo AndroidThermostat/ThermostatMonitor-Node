@@ -55,8 +55,11 @@ class Temperatures extends TemperaturesBase
 	@cast = (baseClass) ->
 		baseClass.__proto__ = Temperatures::
 		return baseClass
-	@loadRange: (thermostatId, startDate, endDate, cb) ->
-		Temperatures.loadFromQuery "SELECT * FROM temperatures WHERE thermostat_id=" + Global.escape(thermostatId) + " and log_date BETWEEN " + Global.escape(startDate) + " AND " + Global.escape(endDate) + " ORDER BY log_date",null, cb
+	@loadRange: (thermostatId, startDate, endDate, adjustedTimezone, cb) ->
+		Temperatures.loadFromQuery "SELECT * FROM temperatures WHERE thermostat_id=" + Global.escape(thermostatId) + " and log_date BETWEEN " + Global.escape(Utils.getServerDate(startDate, adjustedTimezone)) + " AND " + Global.escape(Utils.getServerDate(endDate, adjustedTimezone)) + " ORDER BY log_date",null, (temps) ->
+			temps.forEach (temp) ->
+				temp.logDate = Utils.getUserDate(temp.logDate, adjustedTimezone)
+			cb temps
 	@loadFromQuery = ( query, params, cb ) ->
 		TemperaturesBase.loadFromQuery query, params, (data) ->
 			cb Temperatures.cast(data)

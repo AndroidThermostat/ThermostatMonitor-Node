@@ -16,78 +16,83 @@ class ChartModel
 		startDate = new Date(reportDate.toString())
 		endDate = new Date(reportDate.toString())
 		endDate.setDate(endDate.getDate() + 1)
-		Temperatures.loadRange thermostatId, startDate, endDate, (temps) ->
-			startDate.setHours(startDate.getHours() + 5) #temp patch
-			endDate.setHours(endDate.getHours() + 5) #temp patch
+		Thermostat.load thermostatId, (thermostat) ->
+			Location.load thermostat.locationId, (location) ->
+				tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
+				Temperatures.loadRange thermostatId, startDate, endDate, tz, (temps) ->
+					startDate.setHours(startDate.getHours() - tz)
+					endDate.setHours(endDate.getHours() - tz)
 
-			result = []
-			prevTemp = 0
+					result = []
+					prevTemp = 0
 
 
-			result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), temps[0].degrees]
+					result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), temps[0].degrees]
 
-			temps.forEach (temp) ->
-				if prevTemp>0
-					timeMinusOne = new Date(temp.logDate)
-					timeMinusOne.setSeconds(timeMinusOne.getSeconds()-1)
-					result.push [Utils.getDisplayDate(timeMinusOne,'yyyy/mm/dd HH:MM:ss'), prevTemp]
-				result.push [Utils.getDisplayDate(temp.logDate,'yyyy/mm/dd HH:MM:ss'), temp.degrees]
-				prevTemp = temp.degrees
+					temps.forEach (temp) ->
+						if prevTemp>0
+							timeMinusOne = new Date(temp.logDate)
+							timeMinusOne.setSeconds(timeMinusOne.getSeconds()-1)
+							result.push [Utils.getDisplayDate(timeMinusOne,'yyyy/mm/dd HH:MM:ss'), prevTemp]
+						result.push [Utils.getDisplayDate(temp.logDate,'yyyy/mm/dd HH:MM:ss'), temp.degrees]
+						prevTemp = temp.degrees
 
-			startDate.setHours(23,59,59,0)
-			result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), prevTemp]
+					startDate.setHours(23,59,59,0)
+					result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), prevTemp]
 
-			cb
-				data: JSON.stringify(result)
+					cb
+						data: JSON.stringify(result)
 	@conditionsChart: (locationId, reportDate, req, cb) ->
 		startDate = new Date(reportDate.toString())
 		endDate = new Date(reportDate.toString())
 		endDate.setDate(endDate.getDate() + 1)
-		OutsideConditions.loadRange locationId, startDate, endDate, (conditions) ->
-			startDate.setHours(startDate.getHours() + 5) #temp patch
-			endDate.setHours(endDate.getHours() + 5) #temp patch
-			result = []
-			prevTemp = 0
-			result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), conditions[0].degrees]
-			conditions.forEach (condition) ->
-				#if prevTemp>0
-					#timeMinusOne = new Date(condition.logDate)
-					#timeMinusOne.setSeconds(timeMinusOne.getSeconds()-1)
-					#result.push [Utils.getDisplayDate(timeMinusOne,'yyyy/mm/dd HH:MM:ss'), prevTemp]
-				result.push [Utils.getDisplayDate(condition.logDate,'yyyy/mm/dd HH:MM:ss'), condition.degrees]
-				prevTemp = condition.degrees
-			startDate.setHours(23,59,59,0)
-			result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), prevTemp]
+		Location.load locationId, (location) ->
+			tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
+			OutsideConditions.loadRange locationId, startDate, endDate, tz, (conditions) ->
+				startDate.setHours(startDate.getHours() - tz)
+				endDate.setHours(endDate.getHours() - tz)
+				result = []
+				prevTemp = 0
+				result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), conditions[0].degrees]
+				conditions.forEach (condition) ->
+					#if prevTemp>0
+						#timeMinusOne = new Date(condition.logDate)
+						#timeMinusOne.setSeconds(timeMinusOne.getSeconds()-1)
+						#result.push [Utils.getDisplayDate(timeMinusOne,'yyyy/mm/dd HH:MM:ss'), prevTemp]
+					result.push [Utils.getDisplayDate(condition.logDate,'yyyy/mm/dd HH:MM:ss'), condition.degrees]
+					prevTemp = condition.degrees
+				startDate.setHours(23,59,59,0)
+				result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), prevTemp]
 
-			cb
-				data: JSON.stringify(result)
+				cb
+					data: JSON.stringify(result)
 	@cyclesChart: (thermostatId, reportDate, req, cb) ->
 		startDate = new Date(reportDate.toString())
 		endDate = new Date(reportDate.toString())
 		endDate.setDate(endDate.getDate() + 1)
-		Cycles.loadRange thermostatId, startDate, endDate, (cycles) ->
-			result = []
-			
-			startDate.setHours(startDate.getHours() + 5) #temp patch
-			endDate.setHours(endDate.getHours() + 5) #temp patch
+		Thermostat.load thermostatId, (thermostat) ->
+			Location.load thermostat.locationId, (location) ->
+				tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
+				Cycles.loadRange thermostatId, startDate, endDate, tz, (cycles) ->
+					result = []
+					startDate = Utils.getUserDate(Utils.getUtc(startDate), tz)
+					endDate = Utils.getUserDate(Utils.getUtc(endDate), tz)
+					result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), 0]
+					cycles.forEach (cycle) ->
+						cycle.endDate = endDate if cycle.endDate==null
+						startMinusOne = new Date(cycle.startDate)
+						startMinusOne.setSeconds(startMinusOne.getSeconds()-1)
+						endMinusOne = new Date(cycle.endDate)
+						endMinusOne.setSeconds(endMinusOne.getSeconds()-1)
 
-
-			result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), 0]
-			cycles.forEach (cycle) ->
-				cycle.endDate = endDate if cycle.endDate==null
-				startMinusOne = new Date(cycle.startDate)
-				startMinusOne.setSeconds(startMinusOne.getSeconds()-1)
-				endMinusOne = new Date(cycle.endDate)
-				endMinusOne.setSeconds(endMinusOne.getSeconds()-1)
-
-				result.push [Utils.getDisplayDate(startMinusOne,'yyyy/mm/dd HH:MM:ss'), 0]
-				result.push [Utils.getDisplayDate(cycle.startDate,'yyyy/mm/dd HH:MM:ss'), 1]
-				result.push [Utils.getDisplayDate(endMinusOne,'yyyy/mm/dd HH:MM:ss'), 1]
-				result.push [Utils.getDisplayDate(cycle.endDate,'yyyy/mm/dd HH:MM:ss'), 0]
-			result.push [Utils.getDisplayDate(endDate,'yyyy/mm/dd HH:MM:ss'),0]
-			sys.puts result.length
-			cb 
-				data: JSON.stringify(result)
+						result.push [Utils.getDisplayDate(startMinusOne,'yyyy/mm/dd HH:MM:ss'), 0]
+						result.push [Utils.getDisplayDate(cycle.startDate,'yyyy/mm/dd HH:MM:ss'), 1]
+						result.push [Utils.getDisplayDate(endMinusOne,'yyyy/mm/dd HH:MM:ss'), 1]
+						result.push [Utils.getDisplayDate(cycle.endDate,'yyyy/mm/dd HH:MM:ss'), 0]
+					result.push [Utils.getDisplayDate(endDate,'yyyy/mm/dd HH:MM:ss'),0]
+					sys.puts result.length
+					cb 
+						data: JSON.stringify(result)
 	@hourChart: (thermostatId, req, cb) ->
 		startDate = new Date(2000,1,1)
 		endDate = new Date()
@@ -101,22 +106,23 @@ class ChartModel
 		prevEndDate = new Date(req.query['prevEndDate']) if req.query['prevEndDate']
 		compare = req.query['compare']=='true' if req.query['compare']
 
-		tzOffset = 0
-
-		Snapshots.loadRange thermostatId, startDate, endDate, (snapshots) ->
-			data = snapshots.getHourlyStats(tzOffset)
-			if !compare
-				data.unshift ['Hour','Cool','Heat']
-				cb data:JSON.stringify(data)
-			else
-				Snapshots.loadRange thermostatId, prevStartDate, prevEndDate, (prevSnapshots) ->
-					prevData = prevSnapshots.getHourlyStats(tzOffset)
-					prevData.forEach (row) ->
-						existingRow = ChartModel.getRowByKey(data, row[0])
-						existingRow[3] = row[1] #cool
-						existingRow[4] = row[2] #heat
-					data.unshift ['Hour','Cool','Heat','PrevCool','PrevHeat']
-					cb data:JSON.stringify(data)
+		Thermostat.load thermostatId, (thermostat) ->
+			Location.load thermostat.locationId, (location) ->
+				tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
+				Snapshots.loadRange thermostatId, startDate, endDate, tz, (snapshots) ->
+					data = snapshots.getHourlyStats(tz)
+					if !compare
+						data.unshift ['Hour','Cool','Heat']
+						cb data:JSON.stringify(data)
+					else
+						Snapshots.loadRange thermostatId, prevStartDate, prevEndDate,tz, (prevSnapshots) ->
+							prevData = prevSnapshots.getHourlyStats(tz)
+							prevData.forEach (row) ->
+								existingRow = ChartModel.getRowByKey(data, row[0])
+								existingRow[3] = row[1] #cool
+								existingRow[4] = row[2] #heat
+							data.unshift ['Hour','Cool','Heat','PrevCool','PrevHeat']
+							cb data:JSON.stringify(data)
 	@deltaChart: (thermostatId, req, cb) ->
 		startDate = new Date(2000,1,1)
 		endDate = new Date()

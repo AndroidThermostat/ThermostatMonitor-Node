@@ -118,12 +118,16 @@ class CpModel
 					Thermostat.delete thermostatId, () ->
 						cb()
 	@thermostat: (thermostatId, req, cb) ->
-		endDate = new Date
-		startDate = new Date
+		now = new Date()
+		endDate = Utils.removeTime(new Date)
+		startDate = Utils.removeTime(new Date)
 		startDate.setDate(startDate.getDate()-6)
+		endDate.setDate(endDate.getDate()+1)
+
 		Thermostat.load thermostatId, (thermostat) ->
 			Location.load thermostat.locationId, (location) ->
-				Snapshots.loadDailySummary thermostat, location, startDate, endDate, (summary) ->
+				tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
+				Snapshots.loadDailySummary thermostat, location, startDate, endDate, tz, (summary) ->
 					cb
 						title: 'Thermostat: ' + thermostat.displayName, user: req.user, cdn: Config.cdn, thermostat: thermostat, summary: summary
 	@thermostatDay: (thermostatId, reportDate, req, cb) ->

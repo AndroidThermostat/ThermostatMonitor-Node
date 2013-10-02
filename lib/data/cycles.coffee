@@ -28,9 +28,13 @@ class Cycles extends CyclesBase
 			output = Utils.getCsv ['ThermostatId','CycleType','StartTime','EndTime','Minutes','kwH','BTUs'], data
 			cb output
 
-	@loadRange: (thermostatId, startDate, endDate, cb) ->
-		sql = 'SELECT * FROM cycles WHERE thermostat_id=' + Global.escape(thermostatId) + ' AND start_date BETWEEN ' + Global.escape(startDate) + ' and ' + Global.escape(endDate) + ' ORDER BY start_date'
-		Cycles.loadFromQuery sql, null, cb
+	@loadRange: (thermostatId, startDate, endDate, adjustedTimezone, cb) ->
+		sql = 'SELECT * FROM cycles WHERE thermostat_id=' + Global.escape(thermostatId) + ' AND start_date BETWEEN ' + Global.escape(Utils.getServerDate(startDate, adjustedTimezone)) + ' and ' + Global.escape(Utils.getServerDate(endDate, adjustedTimezone)) + ' ORDER BY start_date'
+		Cycles.loadFromQuery sql, null, (cycles) ->
+			cycles.forEach (cycle) ->
+				cycle.startDate = Utils.getUserDate(cycle.startDate, adjustedTimezone)
+				cycle.endDate = Utils.getUserDate(cycle.endDate, adjustedTimezone)
+			cb cycles
 	@cast = (baseClass) ->
 		baseClass.__proto__ = Cycles::
 		return baseClass
