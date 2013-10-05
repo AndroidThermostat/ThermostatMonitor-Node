@@ -160,8 +160,9 @@ class CpModel
 			cb
 				title: 'Report for Thermostat: ' + thermostat.displayName, user: req.user, cdn: Config.cdn, thermostat: thermostat, startDate: Utils.getDisplayDate(startDate), endDate: Utils.getDisplayDate(endDate), prevStartDate: Utils.getDisplayDate(prevStartDate), prevEndDate: Utils.getDisplayDate(prevEndDate), compare: compare
 	@csvCycles: (thermostatId, req, cb) ->
-		Thermostat.load thermostatId, (thermostat) ->
-			Cycles.getCsv thermostat, cb
+		Thermostat.load thermostatId, (thermostat) =>
+			Location.load thermostat.locationId, (location) =>
+				Cycles.getCsv thermostat, location, cb
 				
 	@csvSummary: (thermostatId, req, cb) ->
 		startDate = new Date('2000-01-01')
@@ -212,6 +213,7 @@ class CpModel
 					q.push {thermostat: thermostat, location:location} if location.shareData
 			, (callback2) =>
 				q = async.queue (task, callback3) ->
+					location = locations.getById task.thermostat.locationId
 					Cycles.getCsv task.thermostat, (csv) ->
 						cyclesCsv += csv + '\r\n'
 						#fs.writeFile folder + 't' + task.thermostat.id + '_cycles.csv', csv, (output) ->

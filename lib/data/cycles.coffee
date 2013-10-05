@@ -15,9 +15,10 @@ class Cycles extends CyclesBase
 		@forEach (cycle) ->
 			result.push cycle if cycle.endDate? and cycle.endDate!=null
 		result
-	@getCsv: (thermostat, cb) ->
+	@getCsv: (thermostat, location, cb) ->
 		data = []
-		Cycles.loadRange thermostat.id, new Date('2000-01-01'), new Date(), (cycles) =>
+		tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
+		Cycles.loadRange thermostat.id, new Date('2000-01-01'), new Date(), tz, (cycles) =>
 			cycles.forEach (cycle) ->
 				btus = 0
 				kwH = 0
