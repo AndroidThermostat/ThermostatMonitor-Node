@@ -35,15 +35,17 @@ class OutsideConditions extends OutsideConditionsBase
 		totalDegrees = 0.0
 		i = 0
 		@forEach (item) =>
-			tempStart = item.logDate
-			tempEnd = endTime
-			tempStart = startTime if (startTime.getTime() > tempStart.getTime())
-			tempEnd = @[i+1].logDate if @length > i + 1 and @[i+1]?
-			seconds = (tempEnd.getTime() - tempStart.getTime()) / 1000
-			totalSeconds += seconds
-			totalDegrees += item.degrees * seconds
-			i++
-		result = Math.round(totalDegrees / totalSeconds, 1)
+			if item?
+				tempStart = item.logDate
+				tempEnd = endTime
+				tempStart = startTime if (startTime.getTime() > tempStart.getTime())
+				tempEnd = @[i+1].logDate if @length > i + 1 and @[i+1]?
+				seconds = (tempEnd.getTime() - tempStart.getTime()) / 1000
+				totalSeconds += seconds
+				totalDegrees += item.degrees * seconds
+				i++
+		result = 0;
+		result = Math.round(totalDegrees / totalSeconds, 1) if totalSeconds>0
 		result
 	@getCsv: (locationId, cb) ->
 		data = []

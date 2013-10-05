@@ -38,7 +38,7 @@ class Utils
 	@getServerDate: (userDate, timezone, daylightSavings) ->
 		timezone = @getAdjustedTimezone if daylightSavings?
 		timezoneAdjustment = timezone + new Date().getTimezoneOffset() / 60
-		userDate.setHours(userDate.getHours() - timezoneAdjustment)
+		userDate.setHours(userDate.getHours() - timezoneAdjustment) if timezoneAdjustment!=0
 		userDate
 	@getUserDate: (serverDate, timezone, daylightSavings) ->
 		timezone = @getAdjustedTimezone if daylightSavings?
