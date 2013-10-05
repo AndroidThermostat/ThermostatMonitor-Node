@@ -131,7 +131,8 @@ class Snapshots extends SnapshotsBase
 
 
 	@getDailySummaryCsv: (thermostat, location, startDate, endDate, cb) ->
-		Snapshots.loadDailySummary thermostat, location, startDate, endDate, (rows) =>
+		tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
+		Snapshots.loadDailySummary thermostat, location, startDate, endDate, tz, (rows) =>
 			data = []
 			prevDate = null
 			rows.forEach (row) ->
