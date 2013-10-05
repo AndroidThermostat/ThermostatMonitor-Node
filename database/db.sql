@@ -60,7 +60,7 @@ CREATE  TABLE IF NOT EXISTS `thermostatmonitor`.`thermostats` (
   `fan_kilowatts` FLOAT(53,0) NULL DEFAULT NULL ,
   `brand` VARCHAR(50) NULL DEFAULT NULL ,
   `location_id` INT(10) NULL DEFAULT NULL ,
-  `keat_btu_per_hour` FLOAT(53,0) NULL DEFAULT NULL ,
+  `heat_btu_per_hour` FLOAT(53,0) NULL DEFAULT NULL ,
   `key_name` VARCHAR(50) NULL DEFAULT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_thermostats_locations_idx` (`location_id` ASC) ,
@@ -701,7 +701,7 @@ DELIMITER ;
 
 DELIMITER $$
 USE `thermostatmonitor`$$
-CREATE DEFINER=`TMUser`@`%` PROCEDURE `thermostats_save`(id int, ip_address varchar(50), display_name varchar(50), ac_tons float, ac_seer int, ac_kilowatts float, fan_kilowatts float, brand varchar(50), location_id int, keat_btu_per_hour float, key_name varchar(50))
+CREATE DEFINER=`TMUser`@`%` PROCEDURE `thermostats_save`(id int, ip_address varchar(50), display_name varchar(50), ac_tons float, ac_seer int, ac_kilowatts float, fan_kilowatts float, brand varchar(50), location_id int, heat_btu_per_hour float, key_name varchar(50))
 BEGIN
 	IF EXISTS(SELECT id FROM thermostats WHERE thermostats.id = id) THEN
 		UPDATE thermostats SET
@@ -713,15 +713,15 @@ BEGIN
 			thermostats.fan_kilowatts = fan_kilowatts, 
 			thermostats.brand = brand, 
 			thermostats.location_id = location_id, 
-			thermostats.keat_btu_per_hour = keat_btu_per_hour, 
+			thermostats.heat_btu_per_hour = heat_btu_per_hour, 
 			thermostats.key_name = key_name
 			WHERE thermostats.id = id;
 			SELECT id;
 	ELSE
 		INSERT INTO thermostats
-			(ip_address, display_name, ac_tons, ac_seer, ac_kilowatts, fan_kilowatts, brand, location_id, keat_btu_per_hour, key_name)
+			(ip_address, display_name, ac_tons, ac_seer, ac_kilowatts, fan_kilowatts, brand, location_id, heat_btu_per_hour, key_name)
 		VALUES
-			(ip_address, display_name, ac_tons, ac_seer, ac_kilowatts, fan_kilowatts, brand, location_id, keat_btu_per_hour, key_name);
+			(ip_address, display_name, ac_tons, ac_seer, ac_kilowatts, fan_kilowatts, brand, location_id, heat_btu_per_hour, key_name);
 		SELECT @@Identity;
 	END IF;
 END$$
