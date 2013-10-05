@@ -2,6 +2,7 @@ SnapshotsBase = require("./base/snapshots-base.coffee")
 Snapshot = require("./snapshot.coffee")
 Cycles = require("./cycles.coffee")
 Temperatures = require("./temperatures.coffee")
+Location = require("./location.coffee")
 OutsideConditions = require("./outside-conditions.coffee")
 sys = require("sys")
 Global = require "../global.coffee"
@@ -43,36 +44,38 @@ class Snapshots extends SnapshotsBase
 		result
 	@generate: (thermostat, cb) ->
 		startDate = new Date(2000,1,1)
-		Snapshot.loadLast thermostat.id, (lastSnapshot) ->
-			sys.puts lastSnapshot
-			startDate = new Date(lastSnapshot.startTime.getTime()) if lastSnapshot!=null
-			dayBefore = new Date(startDate.getTime())
-			dayBefore = dayBefore.setDate(dayBefore.getDate() - 1)
-			async.parallel [(callback) =>
-				Cycles.loadRange thermostat.id, startDate, new Date(), (cycles) ->
-					callback null, cycles
-			, (callback) =>
-				Temperatures.loadRange thermostat.id, dayBefore, new Date(), (temperatures) ->
-					callback null, temperatures
-			, (callback) =>
-				OutsideConditions.loadRange thermostat.locationId, dayBefore, new Date(), (conditions) ->
-					callback null, conditions
-			], (err, results) ->
-				cycles = results[0]
-				temperatures = results[1]
-				conditions = results[2]
-				cycles = cycles.getComplete()
-				if cycles.length==0
-					cb()
-				else
-					lastCycleEndDate = new Date(cycles[0].startDate.getTime())
-					lastCycleEndDate = new Date(startDate.getTime()) if lastSnapshot!=null
-					results[0].forEach (cycle) ->
-						sys.puts cycle.startDate
-						Snapshots.logOffCycle thermostat.id, cycle, lastCycleEndDate, results[1], results[2]
-						Snapshots.logOnCycle thermostat.id, cycle, results[1], results[2]
-						lastCycleEndDate = new Date(cycles[0].endDate.getTime());
-					cb()
+		Location.load  thermostat.locationId, (location)->
+			tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
+			Snapshot.loadLast thermostat.id, (lastSnapshot) ->
+				sys.puts lastSnapshot
+				startDate = new Date(lastSnapshot.startTime.getTime()) if lastSnapshot!=null
+				dayBefore = new Date(startDate.getTime())
+				dayBefore = dayBefore.setDate(dayBefore.getDate() - 1)
+				async.parallel [(callback) =>
+					Cycles.loadRange thermostat.id, startDate, new Date(), tz, (cycles) ->
+						callback null, cycles
+				, (callback) =>
+					Temperatures.loadRange thermostat.id, dayBefore, new Date(), tz, (temperatures) ->
+						callback null, temperatures
+				, (callback) =>
+					OutsideConditions.loadRange thermostat.locationId, dayBefore, new Date(), tz, (conditions) ->
+						callback null, conditions
+				], (err, results) ->
+					cycles = results[0]
+					temperatures = results[1]
+					conditions = results[2]
+					cycles = cycles.getComplete()
+					if cycles.length==0
+						cb()
+					else
+						lastCycleEndDate = new Date(cycles[0].startDate.getTime())
+						lastCycleEndDate = new Date(startDate.getTime()) if lastSnapshot!=null
+						results[0].forEach (cycle) ->
+							sys.puts cycle.startDate
+							Snapshots.logOffCycle thermostat.id, cycle, lastCycleEndDate, results[1], results[2]
+							Snapshots.logOnCycle thermostat.id, cycle, results[1], results[2]
+							lastCycleEndDate = new Date(cycles[0].endDate.getTime());
+						cb()
 	@logOffCycle: (thermostatId, cycle, lastCycleEndDate, allTemperatures, allConditions, cb) ->
 		temperatures = allTemperatures.getRange(lastCycleEndDate, cycle.startDate)
 		conditions = allConditions.getRange(lastCycleEndDate, cycle.startDate)
