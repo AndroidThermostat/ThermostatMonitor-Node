@@ -141,7 +141,7 @@ class Snapshots extends SnapshotsBase
 	@loadDailySummary: (thermostat, location, startDate, endDate, adjustedTimezone, cb) ->
 		days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 		result = []
-		sql = 'SELECT date(start_time) as report_date, mode, count(*) as cycles, sum(seconds) as total_seconds, min(outside_temp_low) as low, max(outside_temp_high) as high FROM thermostatmonitor.snapshots where thermostat_id=' + Global.escape(thermostat.id) + ' and start_time between ' + Global.escape(Utils.getServerDate(startDate, adjustedTimezone)) + ' and ' + Global.escape(Utils.getServerDate(endDate, adjustedTimezone)) + ' group by date(start_time), mode'
+		sql = 'SELECT date(start_time) as report_date, mode, count(*) as cycles, sum(seconds) as total_seconds, min(outside_temp_low) as low, max(outside_temp_high) as high FROM snapshots where thermostat_id=' + Global.escape(thermostat.id) + ' and start_time between ' + Global.escape(Utils.getServerDate(startDate, adjustedTimezone)) + ' and ' + Global.escape(Utils.getServerDate(endDate, adjustedTimezone)) + ' group by date(start_time), mode'
 		console.log sql
 		Global.query sql, null, (err, rows) =>
 			sys.puts err if err?
