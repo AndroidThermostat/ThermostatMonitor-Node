@@ -23,12 +23,12 @@ class OutsideConditions extends OutsideConditionsBase
 	getTempHigh: () =>
 		result = -999
 		@forEach (item) =>
-			result = item.degrees if (item.degrees>result)
+			result = item.degrees if (item!=null and item.degrees>result)
 		result
 	getTempLow: () =>
 		result = 999
 		@forEach (item) =>
-			result = item.degrees if (item.degrees<result)
+			result = item.degrees if (item!=null and item.degrees<result)
 		result
 	getTempAverage: (startTime, endTime) =>
 		totalSeconds = 0.0
