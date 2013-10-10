@@ -20,15 +20,11 @@ class ChartModel
 			Location.load thermostat.locationId, (location) ->
 				tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
 				Temperatures.loadRange thermostatId, startDate, endDate, tz, (temps) ->
-					startDate.setHours(startDate.getHours() - tz)
-					endDate.setHours(endDate.getHours() - tz)
-
+					startDate = Utils.getUtc(startDate)
+					endDate = Utils.getUtc(endDate)
 					result = []
 					prevTemp = 0
-
-
 					result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), temps[0].degrees]
-
 					temps.forEach (temp) ->
 						if prevTemp>0
 							timeMinusOne = new Date(temp.logDate)
@@ -49,21 +45,17 @@ class ChartModel
 		Location.load locationId, (location) ->
 			tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
 			OutsideConditions.loadRange locationId, startDate, endDate, tz, (conditions) ->
-				startDate.setHours(startDate.getHours() - tz)
-				endDate.setHours(endDate.getHours() - tz)
+				startDate = Utils.getUtc(startDate)
+				endDate = Utils.getUtc(endDate)
 				result = []
 				prevTemp = 0
 				result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), conditions[0].degrees]
 				conditions.forEach (condition) ->
-					#if prevTemp>0
-						#timeMinusOne = new Date(condition.logDate)
-						#timeMinusOne.setSeconds(timeMinusOne.getSeconds()-1)
-						#result.push [Utils.getDisplayDate(timeMinusOne,'yyyy/mm/dd HH:MM:ss'), prevTemp]
-					result.push [Utils.getDisplayDate(condition.logDate,'yyyy/mm/dd HH:MM:ss'), condition.degrees]
+					if condition.logDate!=null
+						result.push [Utils.getDisplayDate(condition.logDate,'yyyy/mm/dd HH:MM:ss'), condition.degrees] 
 					prevTemp = condition.degrees
 				startDate.setHours(23,59,59,0)
 				result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), prevTemp]
-
 				cb
 					data: JSON.stringify(result)
 	@cyclesChart: (thermostatId, reportDate, req, cb) ->
