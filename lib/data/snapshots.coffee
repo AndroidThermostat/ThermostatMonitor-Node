@@ -44,11 +44,11 @@ class Snapshots extends SnapshotsBase
 		result
 	@generate: (thermostat, cb) ->
 		startDate = new Date(2000,1,1)
-		Location.load  thermostat.locationId, (location)->
+		Location.load  thermostat.locationId, (location)=>
 			tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
-			Snapshot.loadLast thermostat.id, (lastSnapshot) ->
-				sys.puts lastSnapshot
-				startDate = new Date(lastSnapshot.startTime.getTime()) if lastSnapshot!=null
+			Snapshot.loadLast thermostat.id, (lastSnapshot) =>
+				if lastSnapshot!=null
+					startDate = new Date(lastSnapshot.startTime.getTime()) 
 				dayBefore = new Date(startDate.getTime())
 				dayBefore = dayBefore.setDate(dayBefore.getDate() - 1)
 				async.parallel [(callback) =>
@@ -60,7 +60,7 @@ class Snapshots extends SnapshotsBase
 				, (callback) =>
 					OutsideConditions.loadRange thermostat.locationId, dayBefore, new Date(), tz, (conditions) ->
 						callback null, conditions
-				], (err, results) ->
+				], (err, results) =>
 					cycles = results[0]
 					temperatures = results[1]
 					conditions = results[2]
@@ -70,8 +70,8 @@ class Snapshots extends SnapshotsBase
 					else
 						lastCycleEndDate = new Date(cycles[0].startDate.getTime())
 						lastCycleEndDate = new Date(startDate.getTime()) if lastSnapshot!=null
+						sys.puts lastCycleEndDate
 						results[0].forEach (cycle) ->
-							sys.puts cycle.startDate
 							Snapshots.logOffCycle thermostat.id, cycle, lastCycleEndDate, results[1], results[2]
 							Snapshots.logOnCycle thermostat.id, cycle, results[1], results[2]
 							lastCycleEndDate = new Date(cycles[0].endDate.getTime());

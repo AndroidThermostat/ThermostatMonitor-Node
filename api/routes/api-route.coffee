@@ -30,6 +30,8 @@ class ApiRoute
 							ApiModel.logTemp thermostat, temperature
 						when "conditions"
 							ApiModel.logConditions thermostat.locationId, temperature
+						when "snapshotdebug"
+							ApiModel.generateSnapshots thermostat
 						#when "stats"
 							#ApiModel.redirectToStats thermostat
 						else
