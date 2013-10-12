@@ -67,8 +67,8 @@ class ChartModel
 				tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
 				Cycles.loadRange thermostatId, startDate, endDate, tz, (cycles) ->
 					result = []
-					startDate = Utils.getUserDate(Utils.getUtc(startDate), tz)
-					endDate = Utils.getUserDate(Utils.getUtc(endDate), tz)
+					startDate = Utils.getUtc(startDate)
+					endDate = Utils.getUtc(endDate)
 					result.push [Utils.getDisplayDate(startDate,'yyyy/mm/dd HH:MM:ss'), 0]
 					cycles.forEach (cycle) ->
 						cycle.endDate = endDate if cycle.endDate==null
