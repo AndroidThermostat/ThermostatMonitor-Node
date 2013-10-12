@@ -5,11 +5,8 @@ path = require "path"
 express = require "express"
 Config = require "../config.coffee"
 
-CpRoute = require "./routes/cp-route.coffee"
-ChartRoute = require "./routes/chart-route.coffee"
-StaticRoute = require "./routes/static-route.coffee"
-LoginRoute = require "./routes/login-route.coffee"
-
+Error = require '../lib/data/error.coffee'
+Routes = require "./routes/index.coffee"
 
 app = express()
 
@@ -31,41 +28,53 @@ app.configure () ->
 	app.use app.router
 	app.use require('stylus').middleware(__dirname + '/public')
 	app.use express.static(path.join(__dirname, 'public'))
-	app.use StaticRoute.log404
-LoginRoute.setupPassport()
+	app.use Routes.Static.log404
+	app.use (err, req, res, next) ->
+		userId = 0
+		userId = req.user.id if req.user?
+		Error.log userId,err.stack,req.url, () ->
+		console.log "Caught exception: " + err
+		res.send(500, 'An unexpected error occurred.  Please return to the home page and try again.');
+
+Routes.Login.setupPassport()
 
 app.post "/auth/login", passport.authenticate("local", {successRedirect: '/cp/', failureRedirect: '/'})
-app.post "/cp/location/save", CpRoute.locationSave
-app.post "/cp/location/delete", CpRoute.locationDelete
-app.post "/cp/thermostat/save", CpRoute.thermostatSave
-app.post "/cp/thermostat/delete", CpRoute.thermostatDelete
-app.post "/cp/user/save", CpRoute.userSave
+app.post "/cp/location/save", Routes.CP.locationSave
+app.post "/cp/location/delete", Routes.CP.locationDelete
+app.post "/cp/thermostat/save", Routes.CP.thermostatSave
+app.post "/cp/thermostat/delete", Routes.CP.thermostatDelete
+app.post "/cp/user/save", Routes.CP.userSave
 
-app.get "/", StaticRoute.home
+app.get "/", Routes.Static.home
 app.get "/auth/login", passport.authenticate("local", {successRedirect: '/cp/', failureRedirect: '/'})
-app.get "/auth/logout", LoginRoute.logout
-app.get "/auth/forgot", LoginRoute.forgotPassword
-app.get "/auth/register", LoginRoute.register
-app.get "/cp/", CpRoute.cp
-app.get "/cp/charts/delta/:thermostatId", ChartRoute.deltaChart
-app.get "/cp/charts/hours/:thermostatId", ChartRoute.hourChart
-app.get "/cp/charts/temps", ChartRoute.tempsChart
-app.get "/cp/charts/conditions", ChartRoute.conditionsChart
-app.get "/cp/charts/cycles", ChartRoute.cyclesChart
+app.get "/auth/logout", Routes.Login.logout
+app.get "/auth/forgot", Routes.Login.forgotPassword
+app.get "/auth/register", Routes.Login.register
+app.get "/cp/", Routes.CP.cp
+app.get "/cp/charts/delta/:thermostatId", Routes.Chart.deltaChart
+app.get "/cp/charts/hours/:thermostatId", Routes.Chart.hourChart
+app.get "/cp/charts/temps", Routes.Chart.tempsChart
+app.get "/cp/charts/conditions", Routes.Chart.conditionsChart
+app.get "/cp/charts/cycles", Routes.Chart.cyclesChart
 
-app.get "/cp/location/edit/:locationId", CpRoute.locationEdit
-app.get "/cp/location/config/:locationId", CpRoute.downloadConfig
-app.get "/cp/thermostat/edit/:thermostatId", CpRoute.thermostatEdit
-app.get "/cp/thermostat/:thermostatId", CpRoute.thermostat
-app.get "/cp/thermostat/:thermostatId/csv/cycles", CpRoute.csvCycles
-app.get "/cp/thermostat/:thermostatId/csv/summary", CpRoute.csvSummary
-app.get "/cp/account", CpRoute.userEdit
-app.get "/csv/thermostats", CpRoute.csvThermostats
-app.get "/csv/export", CpRoute.csvExport
+app.get "/cp/location/edit/:locationId", Routes.CP.locationEdit
+app.get "/cp/location/config/:locationId", Routes.CP.downloadConfig
+app.get "/cp/thermostat/edit/:thermostatId", Routes.CP.thermostatEdit
+app.get "/cp/thermostat/:thermostatId", Routes.CP.thermostat
+app.get "/cp/thermostat/:thermostatId/csv/cycles", Routes.CP.csvCycles
+app.get "/cp/thermostat/:thermostatId/csv/summary", Routes.CP.csvSummary
+app.get "/cp/account", Routes.CP.userEdit
+app.get "/csv/thermostats", Routes.CP.csvThermostats
+app.get "/csv/export", Routes.CP.csvExport
 
-app.get "/cp/thermostat/:thermostatId/reports", CpRoute.thermostatReport
-app.get "/cp/thermostat/:thermostatId/day/:date", CpRoute.thermostatDay
-app.get "/terms", StaticRoute.terms
+app.get "/cp/thermostat/:thermostatId/reports", Routes.CP.thermostatReport
+app.get "/cp/thermostat/:thermostatId/day/:date", Routes.CP.thermostatDay
+app.get "/terms", Routes.Static.terms
 
 http.createServer(app).listen app.get('port'), ()->
   console.log "Express server listening on port " + app.get('port')
+
+
+process.on "uncaughtException", (err) ->
+	Error.log 0,err,'', () ->
+		console.log "Caught exception: " + err

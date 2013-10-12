@@ -11,4 +11,11 @@ class Error extends ErrorBase
 	@loadFromQuery = ( query, params, cb ) ->
 		ErrorBase.loadFromQuery query, params, (data) ->
 			cb Error.cast(data)
+	@log: (userId, errorMessage, url, cb) ->
+		e = new Error()
+		e.logDate = new Date()
+		e.userId = userId if userId? and userId>0
+		e.errorMessage = errorMessage
+		e.url = url
+		e.save cb
 module.exports = Error
