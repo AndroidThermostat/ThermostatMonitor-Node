@@ -48,7 +48,8 @@ class Snapshots extends SnapshotsBase
 			tz = Utils.getAdjustedTimezone location.timezone, location.daylightSavings
 			Snapshot.loadLast thermostat.id, (lastSnapshot) =>
 				if lastSnapshot!=null
-					startDate = Utils.getUserDate(new Date(lastSnapshot.startTime.getTime()),tz)
+					startDate = Utils.utcToServer(Utils.getUserDate(new Date(lastSnapshot.startTime.getTime()),tz))
+
 				dayBefore = new Date(startDate.getTime())
 				dayBefore = dayBefore.setDate(dayBefore.getDate() - 1)
 				async.parallel [(callback) =>

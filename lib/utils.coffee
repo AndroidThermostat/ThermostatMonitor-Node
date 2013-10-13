@@ -50,8 +50,10 @@ class Utils
 		serverDate.setHours(serverDate.getHours() + timezoneAdjustment)
 		serverDate
 	@getUtc: (date) ->
-		sys.puts date.getTimezoneOffset()
 		date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
+		date
+	@utcToServer: (date) ->
+		date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
 		date
 	@removeTime: (date) ->
 		date.setMinutes(-date.getTimezoneOffset())
