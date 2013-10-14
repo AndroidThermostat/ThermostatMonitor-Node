@@ -32,7 +32,7 @@ class Cycles extends CyclesBase
 	@loadRange: (thermostatId, startDate, endDate, adjustedTimezone, cb) ->
 		console.log startDate
 		console.log adjustedTimezone
-		sql = 'SELECT * FROM cycles WHERE thermostat_id=' + Global.escape(thermostatId) + ' AND start_date BETWEEN ' + Global.escape(Utils.getServerDate(startDate, adjustedTimezone)) + ' and ' + Global.escape(Utils.getServerDate(endDate, adjustedTimezone)) + ' ORDER BY start_date'
+		sql = 'SELECT * FROM cycles WHERE thermostat_id=' + Global.escape(thermostatId) + ' AND start_date BETWEEN ' + Global.escape(Utils.utcToServer(Utils.getServerDate(startDate, adjustedTimezone),adjustedTimezone)) + ' and ' + Global.escape(Utils.utcToServer(Utils.getServerDate(endDate, adjustedTimezone),adjustedTimezone)) + ' ORDER BY start_date'
 		console.log sql
 		Cycles.loadFromQuery sql, null, (cycles) ->
 			cycles.forEach (cycle) ->
