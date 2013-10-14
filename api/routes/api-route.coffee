@@ -36,6 +36,4 @@ class ApiRoute
 							#ApiModel.redirectToStats thermostat
 						else
 							res.end "Invalid action"
-	@log404: (req, res, next) ->
-		res.redirect "/"
 module.exports = ApiRoute
