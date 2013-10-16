@@ -49,6 +49,7 @@ class Snapshots extends SnapshotsBase
 			Snapshot.loadLast thermostat.id, (lastSnapshot) =>
 				if lastSnapshot!=null
 					startDate = new Date(lastSnapshot.startTime.getTime())
+					startDate.setSeconds(startDate.getSeconds() + 1)
 
 				dayBefore = new Date(startDate.getTime())
 				dayBefore = dayBefore.setDate(dayBefore.getDate() - 1)
