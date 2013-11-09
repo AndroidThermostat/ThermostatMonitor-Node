@@ -35,6 +35,7 @@ class Utils
 		jan.getTimezoneOffset()!=now.getTimezoneOffset()
 	@getAdjustedTimezone: (timezone, daylightSavings) ->
 		timezone = timezone + 1 if daylightSavings and @isDaylightSavings()
+		timezone
 	@getServerDate: (userDate, timezone, daylightSavings) ->
 		if not userDate.setHours?
 			userDate = new Date(userDate)
